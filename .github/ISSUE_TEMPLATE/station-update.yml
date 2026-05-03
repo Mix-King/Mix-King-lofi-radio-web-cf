@@ -1,0 +1,74 @@
+name: 电台源补充 / 内容维护
+description: 补充新电台、修复失效源、移除无效内容，或更新文档文案
+title: "[Content] "
+labels:
+  - content
+  - needs-triage
+body:
+  - type: markdown
+    attributes:
+      value: |
+        这个模板适合：
+        - 新增可公开访问的电台源
+        - 修复失效流地址
+        - 移除长期不可用的源
+        - 更新 README / 文案 / 信息性内容
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: 提交前确认
+      options:
+        - label: 我已搜索现有 Issue / PR，确认不是重复内容
+          required: true
+        - label: 我确认相关资源是公开可访问的，且分享这些链接不存在明显的授权风险
+          required: true
+  - type: dropdown
+    id: change-type
+    attributes:
+      label: 维护类型
+      options:
+        - 新增电台源
+        - 修复失效电台源
+        - 移除失效电台源
+        - 更新 README / 文案
+        - 其他内容维护
+    validations:
+      required: true
+  - type: input
+    id: target
+    attributes:
+      label: 涉及的电台、页面或资源
+      placeholder: 例如：Lofi Cafe / README 电台列表 / src/lib/stations.ts
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: 具体变更建议
+      description: 如是电台源，请尽量包含名称、来源页面、流地址、分类、地区、是否长期可用等信息。
+      placeholder: |
+        例如：
+        - 电台名称：
+        - 来源页面：
+        - 流地址：
+        - 建议分类：
+        - 变更原因：
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: 你如何验证这项信息
+      description: 说明你实际验证过什么，例如播放可用、文案已核对、来源已失效等。
+      placeholder: |
+        例如：
+        - 本地实际播放 10 分钟无中断
+        - 浏览器 Network 返回 200
+        - 上游来源页面已标记下线
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: 补充信息
+      description: 可附截图、录屏、相关讨论链接等。

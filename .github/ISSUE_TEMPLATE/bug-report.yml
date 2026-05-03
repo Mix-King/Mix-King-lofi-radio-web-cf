@@ -1,0 +1,123 @@
+name: Bug 反馈
+description: 报告一个可复现的问题、异常行为或回归
+title: "[Bug] "
+labels:
+  - bug
+  - needs-triage
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈问题。请尽量把问题描述完整，这会显著提高排查效率。
+
+        提交前请先确认：
+        - 已搜索过现有 Issue / Discussions，避免重复
+        - 已阅读 README 中与你的问题相关的说明
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: 提交前确认
+      options:
+        - label: 我已搜索现有 Issue，确认这不是重复问题
+          required: true
+        - label: 我已阅读 README / 部署说明，并确认文档中没有直接答案
+          required: true
+        - label: 我愿意按需要补充日志、截图或复现信息
+          required: true
+  - type: textarea
+    id: current-behavior
+    attributes:
+      label: 问题描述
+      description: 说明实际发生了什么，包含错误提示、异常现象、回归表现等。
+      placeholder: |
+        例如：
+        1. 打开首页后点击播放
+        2. 选择 Bilibili 电台
+        3. 播放器持续 loading，控制台报 403 / manifest 加载失败
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: 期望结果
+      description: 说明你原本预期会发生什么。
+      placeholder: 例如：点击播放后应在几秒内开始播放音频，不应一直 loading。
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      description: 请提供尽可能稳定、可重复的复现步骤。
+      placeholder: |
+        1. 进入 ...
+        2. 点击 ...
+        3. 切换到 ...
+        4. 观察到 ...
+    validations:
+      required: true
+  - type: dropdown
+    id: scope
+    attributes:
+      label: 问题范围
+      options:
+        - Web UI / 交互
+        - 音频播放 / 播放器
+        - Bilibili 取流 / API
+        - SEO / PWA
+        - 构建 / 部署
+        - 其他
+    validations:
+      required: true
+  - type: dropdown
+    id: deploy-target
+    attributes:
+      label: 运行环境
+      options:
+        - 本地开发环境
+        - Vercel
+        - Netlify
+        - Cloudflare Pages
+        - Docker / 自托管
+        - 其他
+    validations:
+      required: true
+  - type: input
+    id: page-url
+    attributes:
+      label: 相关页面或部署地址
+      description: 如可公开访问，请提供 URL；如不能公开访问，可留空。
+      placeholder: https://example.com
+  - type: input
+    id: version
+    attributes:
+      label: 版本 / 分支 / 提交信息
+      description: 如你基于某个分支、commit 或自行二开，请写明。
+      placeholder: main / commit sha / 自定义分支名
+  - type: input
+    id: browser
+    attributes:
+      label: 浏览器
+      placeholder: Chrome 136 / Safari 18 / Firefox 127
+  - type: input
+    id: os
+    attributes:
+      label: 操作系统
+      placeholder: Windows 11 / macOS 15 / iOS 18 / Android 15
+  - type: input
+    id: node
+    attributes:
+      label: Node.js 版本
+      placeholder: 20.18.0
+  - type: input
+    id: package-manager
+    attributes:
+      label: 包管理器
+      placeholder: npm / pnpm / yarn / bun
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志、截图或补充信息
+      description: 建议粘贴控制台报错、构建日志、请求返回信息或截图。
+      render: shell
+      placeholder: 粘贴与问题直接相关的日志；请不要包含敏感信息。

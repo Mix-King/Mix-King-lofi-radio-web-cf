@@ -22,10 +22,10 @@ macOS 风格灵动岛设计，21 个精选电台，打开即用，无需下载
 <div align="center">
 
 ### 亮色模式
-![Lofi Radio Hero Light](https://cdn.jsdmirror.com/gh/88lin/picx-images-hosting@master/hero-image.jpg)
+![Lofi Radio Hero Light](https://cdn.jsdelivr.net/gh/88lin/picx-images-hosting@master/hero-image.jpg)
 
 ### 暗色模式
-![Lofi Radio Hero Dark](https://cdn.jsdmirror.com/gh/88lin/picx-images-hosting@master/hero-image-dark.jpg)
+![Lofi Radio Hero Dark](https://cdn.jsdelivr.net/gh/88lin/picx-images-hosting@master/hero-image-dark.jpg)
 
 </div>
 
@@ -229,69 +229,86 @@ npm run start
 >
 > 以下所有部署方式都将基于你 Fork 的仓库进行操作。
 
+### 部署前先确认
+
+当前仓库的已验证部署前提如下：
+
+- 运行时要求：Node.js `>= 20.9.0`
+- 应用类型：标准 Next.js 服务端应用，不是纯静态站点
+- API 依赖：`/api/bilibili-stream` 显式使用 Node.js runtime
+- 外网访问：部署环境需要允许服务端访问 `api.live.bilibili.com` 和 `api.github.com`
+
+这意味着部署平台至少要满足两件事：
+
+1. 支持 Next.js 的服务端运行模式
+2. 支持 Node.js 20+ 的服务端出网请求
+
+如果平台只适合纯静态导出，或者对 Node.js runtime / 服务端出网支持有限，就不适合作为本项目的默认部署路径。
+
 ### 部署到 Vercel（推荐）
 
-[Vercel](https://vercel.com) 是 Next.js 的官方部署平台，部署最简单：
+[Vercel](https://vercel.com) 是当前最推荐的部署方式，也是和本仓库结构最匹配的托管平台。
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/88lin/lofi-radio-web)
 
 1. 点击上方按钮，或访问 [Vercel Dashboard](https://vercel.com/dashboard)
 2. 导入你 Fork 的 `lofi-radio-web` 仓库
-3. Vercel 会自动检测 Next.js 并配置构建设置
-4. 点击 "Deploy" 即可完成部署
+3. 保持默认 Framework Preset 为 `Next.js`
+4. Build Command 使用默认值，或显式填写 `npm run build`
+5. 安装命令保持默认值，或显式填写 `npm install`
+6. Node.js 版本设置为 `20.x` 或更高
+7. 当前默认公开功能通常不需要额外环境变量，直接点击 `Deploy` 即可
 
-### 部署到 Cloudflare Pages（不推荐）
+如果后续你在自己的分支中启用了数据库、鉴权或其他扩展能力，再按你的改动补充对应环境变量。
 
-[Cloudflare Pages](https://pages.cloudflare.com) 在本项目的 Bilibili 直播解析场景下稳定性较差，当前更建议直接部署到 Vercel。
+### 部署到标准 Node.js 服务器（推荐）
 
-> ⚠️ **说明**: 这一方案当前没有继续维护。尤其是 `src/app/api/bilibili-stream` 这类依赖 Node.js 服务端请求上游的接口，在 Cloudflare Pages 上容易出现不稳定或上游拦截。
->
-> 如果你一定要继续使用 Cloudflare，更建议把前端静态页面和 Bilibili 解析 API 拆开部署，而不是整站直接沿用当前配置。
+如果你使用自己的 Linux 服务器、云主机、PaaS 或面板，推荐按标准 Next.js Node 服务方式部署。
 
-### 部署到 Netlify
+```bash
+# 安装依赖
+npm install
 
-[Netlify](https://www.netlify.com) 也是优秀的托管平台：
+# 构建
+npm run build
 
-1. 登录 [Netlify](https://app.netlify.com)
-2. 点击 "Add new site" > "Import an existing project"
-3. 选择 GitHub 并授权
-4. 选择你 Fork 的 `lofi-radio-web` 仓库
-5. 配置构建设置：
-   - **Build command**: `npm run build`
-   - **Publish directory**: `.next`
-6. 点击 "Deploy site"
-
-### Docker 部署
-
-```dockerfile
-# Dockerfile
-FROM node:18-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
-FROM node:18-alpine AS runner
-WORKDIR /app
-ENV NODE_ENV=production
-COPY --from=builder /app/package*.json ./
-RUN npm ci --omit=dev
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/public ./public
-EXPOSE 3000
-COPY --from=builder /app/next.config.ts ./next.config.ts
-CMD ["npm", "run", "start"]
+# 启动生产服务
+npm run start
 ```
+
+默认监听端口为 `3000`。如果你需要反向代理，可以直接把 Nginx / Caddy 指向这个端口。
+
+仓库中已包含一个可参考的 [Caddyfile](./Caddyfile)，适合本地或自托管场景做反向代理。
+
+### Docker 部署（推荐）
+
+仓库根目录现已提供可直接使用的 [Dockerfile](./Dockerfile)。
 
 ```bash
 # 构建镜像
 docker build -t lofi-radio-web .
 
 # 运行容器
-docker run -p 3000:3000 lofi-radio-web
+docker run -d --name lofi-radio-web -p 3000:3000 --restart unless-stopped lofi-radio-web
 ```
+
+容器启动后，应用会在容器内执行 `npm run start`，默认对外提供 `3000` 端口。
+
+### Cloudflare Pages / Netlify / 其他平台
+
+这类平台不是当前仓库的主推荐部署路径。原因不是“不能部署”，而是：
+
+- 本项目包含服务端 API，而不是纯静态页面
+- `/api/bilibili-stream` 依赖 Node.js runtime 和服务端出网请求
+- 不同平台对 Next.js server runtime、适配器、Node.js 版本和网络策略的支持差异较大
+
+如果你非常熟悉这些平台，可以自行验证适配方案；否则更建议优先使用：
+
+- Vercel
+- 标准 Node.js 服务器
+- Docker + 反向代理
+
+其中，原先 README 中把某些平台写成固定构建配置的做法并不准确，因此这里不再给出未经仓库验证的模板化参数。
 
 ---
 
@@ -332,6 +349,7 @@ lofi-radio-web/
 ├── scripts/                     # 构建辅助脚本
 │   └── submit-indexnow.ts       # 手动提交 IndexNow
 ├── package.json
+├── Dockerfile
 ├── tailwind.config.ts
 ├── next.config.ts
 └── LICENSE
@@ -362,15 +380,38 @@ lofi-radio-web/
 
 ---
 
+## 💬 反馈与协作
+
+为了让反馈更快进入可处理状态，请按内容选择入口：
+
+- [💬 Discussions](https://github.com/88lin/lofi-radio-web/discussions)：
+  使用问题、开放讨论、思路交流、暂不确定是否属于缺陷的问题
+- [🐛 Bug 反馈](https://github.com/88lin/lofi-radio-web/issues/new/choose)：
+  可复现的功能异常、回归问题、播放器或 API 故障
+- [🚀 功能建议](https://github.com/88lin/lofi-radio-web/issues/new/choose)：
+  新特性、交互优化、维护体验改进
+- [🛠️ 部署 / 环境问题](https://github.com/88lin/lofi-radio-web/issues/new/choose)：
+  安装、构建、部署、环境变量与平台兼容问题
+- [📻 电台源补充 / 内容维护](https://github.com/88lin/lofi-radio-web/issues/new/choose)：
+  新增电台、修复失效源、更新 README / 文案
+
+仓库已启用结构化 Issue 模板、PR 模板和自动维护流程。提报越完整，越容易被快速处理。
+
 ## 🤝 贡献指南
 
-欢迎所有形式的贡献！
+欢迎所有形式的贡献，但请尽量保持改动聚焦、上下文完整。
 
 1. Fork 本仓库
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 创建 Pull Request
+2. 创建分支，例如 `fix/player-bug` 或 `feat/new-station-source`
+3. 完成修改并本地自检
+4. 推送分支并创建 Pull Request
+
+提交 PR 前，建议先阅读 [CONTRIBUTING.md](./CONTRIBUTING.md)，其中包含：
+
+- Issue / PR 的推荐提交流程
+- 本地开发与最少验证命令
+- 电台源与内容维护的注意事项
+- 对陌生贡献者更友好的协作约定
 
 ---
 
@@ -395,8 +436,9 @@ lofi-radio-web/
 
 如有问题或建议，欢迎：
 
-- [💬 Discussions](https://github.com/88lin/lofi-radio-web/discussions) - 参与讨论
-- [🐛 提交 Issue](https://github.com/88lin/lofi-radio-web/issues) - 报告问题
+- [💬 Discussions](https://github.com/88lin/lofi-radio-web/discussions) - 参与讨论与使用交流
+- [🐛 提交 Issue](https://github.com/88lin/lofi-radio-web/issues/new/choose) - 按模板反馈问题或建议
+- [🤝 CONTRIBUTING](./CONTRIBUTING.md) - 查看协作规范与提交流程
 - [📝 博客](https://blog.88lin.eu.org/) - 茉灵智库
 
 ---

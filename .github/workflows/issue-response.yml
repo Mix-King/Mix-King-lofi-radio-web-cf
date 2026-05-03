@@ -1,0 +1,134 @@
+name: Issue Response
+
+on:
+  issues:
+    types:
+      - opened
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  respond-to-new-issue:
+    name: Reply to new issue
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment on new issue
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issue = context.payload.issue;
+            const association = issue.author_association;
+            if (["OWNER", "MEMBER", "COLLABORATOR"].includes(association)) {
+              core.info(`Skip auto-reply for ${association} issue #${issue.number}`);
+              return;
+            }
+
+            const labels = issue.labels.map(label => label.name);
+            const author = issue.user.login;
+
+            const bugComment = [
+              `@${author}，感谢提交 Bug 反馈。`,
+              "",
+              "为了尽快排查，请确认 Issue 中已经包含这些关键信息：",
+              "- 复现步骤",
+              "- 期望结果与实际结果",
+              "- 部署环境或运行平台",
+              "- 相关日志、截图或可公开访问的复现地址",
+              "",
+              "如果信息还不完整，我会在后续评估时请你补充。"
+            ].join("\n");
+
+            const enhancementComment = [
+              `@${author}，感谢提出功能建议。`,
+              "",
+              "我会优先评估这项建议是否符合项目方向、维护成本和现有架构。",
+              "如果你愿意自己实现，欢迎直接提交 PR；提交前建议先阅读仓库中的 `CONTRIBUTING.md`。"
+            ].join("\n");
+
+            const deploymentComment = [
+              `@${author}，感谢反馈部署或环境问题。`,
+              "",
+              "请优先确认：",
+              "- 已按 README 的部署说明执行",
+              "- 平台 Node.js 版本满足 `>= 20.9.0`",
+              "- 环境变量、构建命令和运行时配置已核对",
+              "- 日志中已去除敏感信息",
+              "",
+              "如果这些信息已经在模板里写全，我会按现有信息继续排查。"
+            ].join("\n");
+
+            const contentComment = [
+              `@${author}，感谢补充电台源或内容维护建议。`,
+              "",
+              "这类 Issue 最重要的是来源可靠性和可验证性。",
+              "如果你提供了公开来源、验证方式和变更理由，会更容易被快速处理。"
+            ].join("\n");
+
+            const defaultComment = [
+              `@${author}，感谢提交 Issue。`,
+              "",
+              "我会先做分类和初步判断；如果需要补充信息，会直接在这个 Issue 下继续沟通。",
+              "对于使用讨论、开放问题或暂不确定是否属于缺陷的内容，后续也欢迎发到 Discussions。"
+            ].join("\n");
+
+            let body = defaultComment;
+            if (labels.includes("bug")) body = bugComment;
+            if (labels.includes("enhancement")) body = enhancementComment;
+            if (labels.includes("deployment")) body = deploymentComment;
+            if (labels.includes("content")) body = contentComment;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body
+            });
+
+  backfill-missing-replies:
+    name: Backfill missing replies
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reply to recent issues without maintainer comment
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open",
+              since,
+              per_page: 100
+            });
+
+            for (const issue of issues) {
+              if (issue.pull_request) continue;
+              if (["OWNER", "MEMBER", "COLLABORATOR"].includes(issue.author_association)) continue;
+              if (issue.comments > 0) continue;
+
+              const labels = issue.labels.map(label => label.name);
+              let body = `@${issue.user.login}，这个 Issue 已进入待处理队列。如需补充信息，我会直接在这里继续沟通。`;
+
+              if (labels.includes("deployment")) {
+                body = [
+                  `@${issue.user.login}，部署问题已收到。`,
+                  "",
+                  "如果还没补充完整，请优先补上平台信息、Node.js 版本、构建日志和已检查过的配置项。"
+                ].join("\n");
+              }
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body
+              });
+            }

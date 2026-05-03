@@ -1,0 +1,40 @@
+name: Stale Cleanup
+
+on:
+  schedule:
+    - cron: "30 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    name: Mark and close stale threads
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run stale bot
+        uses: actions/stale@v10
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          stale-issue-label: stale
+          stale-pr-label: stale
+          days-before-issue-stale: 45
+          days-before-issue-close: 10
+          days-before-pr-stale: 30
+          days-before-pr-close: 14
+          exempt-issue-labels: "priority/high,help wanted,good first issue"
+          exempt-pr-labels: "priority/high,help wanted"
+          stale-issue-message: |
+            这个 Issue 已经较长时间没有新的活动，将被标记为 `stale`。
+            如果这个问题仍然有效，请补充最新信息或直接回复；否则它会在 10 天后自动关闭。
+          close-issue-message: |
+            由于长时间没有进一步反馈，这个 Issue 现已自动关闭。
+            如果问题仍然存在，请基于最新环境重新提交一个新的 Issue，并附上可复现信息。
+          stale-pr-message: |
+            这个 PR 已经较长时间没有新的活动，将被标记为 `stale`。
+            如果仍在推进，请回复当前状态或补充最新改动；否则它会在 14 天后自动关闭。
+          close-pr-message: |
+            由于长时间没有进一步活动，这个 PR 现已自动关闭。
+            如果你想继续推进，欢迎基于最新代码重新开启或提交新的 PR。
