@@ -12,17 +12,17 @@ export interface Station {
 }
 
 export const stations: Station[] = [
-  {
-    id: 'lofi-girl',
-    name: 'Lofi Girl',
-    scene: '学习',
-    type: 'bilibili',
-    url: 'https://live.bilibili.com/27519423',
-    style1: 'Lofi',
-    style2: 'Chill',
-    // custom: 'B站',
-    color: '#8B5CF6'
-  },
+{
+  id: 'lofi-girl',
+  name: 'Lofi Girl',
+  scene: '学习',
+  type: 'mp3',                             // ← 改成 mp3
+  url: 'https://cdn.pixabay.com/audio/2026/04/14/audio_fd85ad03a4.mp3',  // ← 你的新音频
+  style1: 'Lofi',
+  style2: 'Chill',
+  // custom: 'B站',
+  color: '#8B5CF6'
+},
   {
     id: 'lofi-box',
     name: 'Lofi Box',
