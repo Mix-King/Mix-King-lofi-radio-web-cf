@@ -6,7 +6,7 @@ export const siteConfig = {
   name: "我的音乐电台",
   url: "https://lofi.zouze.com",
   author: "茉灵智库",
-  creatorUrl: "https://blog.88lin.eu.org/",
+  creatorUrl: "https://lofi.zouze.com",
   githubUrl: "https://github.com/88lin/lofi-radio-web",
   ogImage:
     "https://cdn.jsdmirror.com/gh/88lin/picx-images-hosting@master/hero-image-dark.jpg",
