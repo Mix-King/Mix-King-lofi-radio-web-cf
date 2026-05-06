@@ -1,4 +1,4 @@
-'use client';
+嘘。'use client';
 
 import { useEffect, useSyncExternalStore, useCallback, memo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -208,6 +208,11 @@ const NavBar = memo(({ isDark, isPlaying, currentStation, stationColor, onThemeT
         </AnimatePresence>
       </motion.button>
 
+      <motion.a href="https://github.com/88lin/lofi-radio-web" target="_blank" rel="noopener noreferrer"
+        className={cn("hidden sm:flex w-7 h-7 rounded-full items-center justify-center transition-colors", isDark ? "text-white/60 hover:text-white hover:bg-white/10" : "text-zinc-500 hover:text-zinc-900 hover:bg-black/5")}
+        whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+        <Github className="w-3.5 h-3.5" />
+      </motion.a>
     </div>
   </motion.nav>
 ));
@@ -494,6 +499,15 @@ export default function Home() {
                     className="w-full sm:w-auto rounded-full px-7 h-12 text-base font-semibold shadow-xl"
                     style={{ background: 'linear-gradient(135deg, #8B5CF6, #D946EF)', boxShadow: '0 8px 32px rgba(139,92,246,0.35)' }}>
                     {isPlaying ? <><Pause className="w-5 h-5 mr-2" /><span>正在播放</span></> : <><Play className="w-5 h-5 mr-2" /><span>开始播放</span></>}
+                  </Button>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
+                  <Button variant="outline" size="lg" className={cn("w-full sm:w-auto rounded-full px-7 h-12 text-base font-medium group", isDark && "border-white/15 text-white/80 hover:bg-white/[0.07] hover:border-white/25")} asChild>
+                    <a href="https://github.com/88lin/lofi-radio-web" target="_blank" rel="noopener noreferrer">
+                      <Github className="w-5 h-5 mr-2" />
+                      查看源码
+                      <ExternalLink className="w-4 h-4 ml-2 opacity-40 group-hover:opacity-80 transition-opacity" />
+                    </a>
                   </Button>
                 </motion.div>
               </motion.div>
