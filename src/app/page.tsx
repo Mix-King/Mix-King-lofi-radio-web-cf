@@ -1,4 +1,4 @@
-嘘。'use client';
+'use client';
 
 import { useEffect, useSyncExternalStore, useCallback, memo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
