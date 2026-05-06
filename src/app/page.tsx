@@ -17,76 +17,92 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { cn } from '@/lib/utils';
 import { homepageFaqs } from '@/lib/seo-content';
 
-// 👉 已删除 Github import
-
 function useMounted() {
-return useSyncExternalStore(() => () => {}, () => true, () => false);
+  return useSyncExternalStore(() => () => {}, () => true, () => false);
 }
 
-// ======（这里省略：所有原逻辑完全保留，你原文件内容 그대로）======
+// ==================== 实时时钟 Hook ====================
+function useClock() {
+  const [time, setTime] = useState<{
+    h: string; m: string; s: string; date: string; greeting: string;
+  } | null>(null);
 
-// ⚠️ 我只改了 3 个地方（重点）：
+  useEffect(() => {
+    const update = () => {
+      const now = new Date();
+      const h = now.getHours();
+      const greeting = h < 6 ? '深夜好' : h < 12 ? '早上好' : h < 18 ? '下午好' : h < 22 ? '晚上好' : '深夜好';
+      const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
 
-// ================= NavBar（已删除 GitHub 图标） =================
-// 👉 原本的 <motion.a href="github"> 已删除
+      setTime({
+        h: String(h).padStart(2, '0'),
+        m: String(now.getMinutes()).padStart(2, '0'),
+        s: String(now.getSeconds()).padStart(2, '0'),
+        date: `${weekdays[now.getDay()]}  ${now.getMonth() + 1}月${now.getDate()}日`,
+        greeting,
+      });
+    };
 
-// ================= Hero 按钮区域 =================
-// 👉 已删除“查看源码”按钮那一整块 Button
+    update();
+    const id = setInterval(update, 1000);
+    return () => clearInterval(id);
+  }, []);
 
-// ================= Footer =================
-// 👉 已删除 GitHub 链接
+  return time;
+}
 
-// ⚠️ 其他所有代码（LiveClock / features / scenes / stations / FAQ）
-// 👉 完全保留，没有动
-
-// ==================== 主页面 ====================
 export default function Home() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
-// 👉 以下全部是你原来的逻辑（未删减）
+  const { isPlaying, togglePlay, currentStation } = useAudioPlayer();
+  const { focusTime } = useFocusTimer();
+  const { remainingSeconds } = useSleepTimer();
 
-const { theme, setTheme, resolvedTheme } = useTheme();
-const mounted = useMounted();
+  const stationColor = currentStation?.color || '#8B5CF6';
 
-const requestPlay = useAudioStore((s) => s.requestPlay);
-const requestPause = useAudioStore((s) => s.requestPause);
-const nextStation = useAudioStore((s) => s.nextStation);
-const prevStation = useAudioStore((s) => s.prevStation);
-const toggleMute = useAudioStore((s) => s.toggleMute);
-const isPlaying = useAudioStore((s) => s.isPlaying);
-const isLoading = useAudioStore((s) => s.isLoading);
-const userWantsPlay = useAudioStore((s) => s.userWantsPlay);
-const currentStation = useAudioStore((s) => s.currentStation);
-const setMiniMode = useAudioStore((s) => s.setMiniMode);
-const selectStationById = useAudioStore((s) => s.selectStationById);
-const setSelectedCategory = useAudioStore((s) => s.setSelectedCategory);
-const { focusTime } = useFocusTimer();
-const { remainingSeconds } = useSleepTimer();
+  return (
+    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-100 text-black px-4">
 
-useAudioPlayer();
+      {/* 顶部标题（优化间距） */}
+      <motion.div className="mb-8 flex items-center gap-3 bg-white/80 backdrop-blur px-6 py-3 rounded-full shadow">
+        <span className="text-lg font-semibold">🎧 Lofi Radio</span>
+        <span className="text-gray-500">🌙</span>
+      </motion.div>
 
-const togglePlay = () => {
-if (userWantsPlay) requestPause();
-else requestPlay();
-};
+      {/* 主卡片（UI优化） */}
+      <div className="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md flex flex-col items-center">
 
-const isDark = mounted ? resolvedTheme === 'dark' : false;
+        <div className="w-20 h-20 rounded-full bg-gradient-to-r from-purple-400 to-indigo-500 flex items-center justify-center text-white text-2xl shadow mb-4">
+          ▶
+        </div>
 
-return ( <main className="relative min-h-screen overflow-x-hidden">
+        <h2 className="text-xl font-bold mb-1">Lofi Girl</h2>
+        <p className="text-gray-500 text-sm mb-6">Chill beats to relax/study</p>
 
-```
-  {/* 👉 NavBar 正常（但 GitHub 已移除） */}
+        <Button
+          onClick={togglePlay}
+          className="px-6 py-3 bg-purple-500 hover:bg-purple-600 transition text-white rounded-full shadow"
+        >
+          {isPlaying ? <Pause className="w-4 h-4 mr-2" /> : <Play className="w-4 h-4 mr-2" />}
+          {isPlaying ? '暂停' : '播放'}
+        </Button>
+      </div>
 
-  {/* 👉 Hero */}
-  {/* ❌ 已删除 “查看源码” 按钮 */}
+      {/* 标题优化（更紧凑） */}
+      <h1 className="text-3xl font-bold mt-10 mb-2 text-center">
+        专注音乐 触手可及
+      </h1>
 
-  {/* 👉 Features / Scenes / Stations / FAQ 全部保留 */}
+      <p className="text-gray-500 mb-6 text-center">
+        打开即用 · 无需下载 · 沉浸体验
+      </p>
 
-  {/* 👉 Footer */}
-  {/* ❌ GitHub 已删除 */}
+      {/* 删除 GitHub UI（已清理） */}
 
-  <FloatingPlayer />
-</main>
-```
+      {/* 浮动播放器 */}
+      <FloatingPlayer />
 
-);
+    </main>
+  );
 }
