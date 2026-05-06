@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import { homepageFaqs } from "./seo-content";
 
 export const siteConfig = {
-  name: "Lofi Radio",
-  url: "https://lofi.88lin.eu.org",
+  name: "我的音乐电台",
+  url: "https://lofi.zouze.com",
   author: "茉灵智库",
   creatorUrl: "https://blog.88lin.eu.org/",
   githubUrl: "https://github.com/88lin/lofi-radio-web",
@@ -15,7 +15,7 @@ export const siteConfig = {
 } as const;
 
 export function buildSiteMetadata(): Metadata {
-  const title = "Lofi Radio - 专注音乐电台";
+  const title = "我的音乐电台 - 放松时刻";
 
   return {
     metadataBase: new URL(siteConfig.url),
