@@ -2,7 +2,7 @@
 
 import { useEffect, useSyncExternalStore, useCallback, memo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sun, Moon, Github, Sparkles, Play, Pause, ExternalLink, Waves, Music4, ChevronRight, Radio, Clock3 } from 'lucide-react';
+import { Sun, Moon, Sparkles, Play, Pause, ExternalLink, Waves, Music4, ChevronRight, Radio, Clock3 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { FloatingPlayer } from '@/components/lofi/floating-player';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
@@ -150,7 +150,7 @@ const shortcuts = [
   { key: 'T', label: '切换主题' },
 ];
 
-// 导航栏组件
+// 导航栏组件 - 药丸胶囊形式 + 高斯模糊
 const NavBar = memo(({ isDark, isPlaying, currentStation, stationColor, onThemeToggle }: {
   isDark: boolean; isPlaying: boolean; currentStation: typeof stations[0] | null; stationColor: string; onThemeToggle: () => void;
 }) => (
@@ -207,17 +207,12 @@ const NavBar = memo(({ isDark, isPlaying, currentStation, stationColor, onThemeT
           )}
         </AnimatePresence>
       </motion.button>
-
-      <motion.a href="https://github.com/88lin/lofi-radio-web" target="_blank" rel="noopener noreferrer"
-        className={cn("hidden sm:flex w-7 h-7 rounded-full items-center justify-center transition-colors", isDark ? "text-white/60 hover:text-white hover:bg-white/10" : "text-zinc-500 hover:text-zinc-900 hover:bg-black/5")}
-        whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-        <Github className="w-3.5 h-3.5" />
-      </motion.a>
     </div>
   </motion.nav>
 ));
 NavBar.displayName = 'NavBar';
 
+// 特性卡片组件
 const FeatureCard = memo(({ feature, isDark }: { feature: typeof features[0]; isDark: boolean }) => (
   <motion.div
     variants={scaleIn}
@@ -238,6 +233,7 @@ const FeatureCard = memo(({ feature, isDark }: { feature: typeof features[0]; is
 ));
 FeatureCard.displayName = 'FeatureCard';
 
+// ==================== 场景卡片 ====================
 const SceneCard = memo(({ scene, isDark, onClick }: { scene: typeof scenes[0]; isDark: boolean; onClick: () => void }) => (
   <motion.button
     variants={scaleIn}
@@ -258,6 +254,7 @@ const SceneCard = memo(({ scene, isDark, onClick }: { scene: typeof scenes[0]; i
 ));
 SceneCard.displayName = 'SceneCard';
 
+// 电台卡片组件 - 使用 button 提升可访问性
 const StationCard = memo(({ station, isDark, isActive, isPlaying, onClick }: {
   station: typeof stations[0]; isDark: boolean; isActive: boolean; isPlaying: boolean; onClick: () => void;
 }) => (
@@ -333,7 +330,7 @@ export default function Home() {
 
   const handleStationClick = useCallback((id: string) => { selectStationById(id); setMiniMode(false); }, [selectStationById, setMiniMode]);
   const handleSceneClick = useCallback((sceneId: string) => {
-    const s = stations.filter(st => st.scene === sceneId);
+    const s = stations.filter(s => s.scene === sceneId);
     if (s.length > 0) { setSelectedCategory(sceneId); selectStationById(s[0].id); setMiniMode(false); }
   }, [selectStationById, setMiniMode, setSelectedCategory]);
   const handleThemeToggle = useCallback(() => { setTheme(theme === 'dark' ? 'light' : 'dark'); }, [theme, setTheme]);
@@ -356,26 +353,49 @@ export default function Home() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+
+    let showRafId: number | null = null;
+    let hideTimer: number | null = null;
+
     try {
       const dismissed = window.localStorage.getItem(MOBILE_ISLAND_HINT_DISMISSED_KEY) === '1';
-      if (!dismissed) {
-        setShowMobileHint(true);
-        const timer = setTimeout(() => setShowMobileHint(false), 30000);
-        return () => clearTimeout(timer);
+      if (dismissed) {
+        return;
       }
-    } catch (e) { console.error(e); }
+    } catch {
+      // ignore localStorage access errors
+    }
+
+    showRafId = window.requestAnimationFrame(() => {
+      setShowMobileHint(true);
+    });
+
+    hideTimer = window.setTimeout(() => {
+      setShowMobileHint(false);
+    }, 30000);
 
     const handleIslandExpanded = () => {
       setShowMobileHint(false);
-      try { window.localStorage.setItem(MOBILE_ISLAND_HINT_DISMISSED_KEY, '1'); } catch (e) {}
+      try {
+        window.localStorage.setItem(MOBILE_ISLAND_HINT_DISMISSED_KEY, '1');
+      } catch {
+        // ignore localStorage access errors
+      }
     };
+
     window.addEventListener(MOBILE_ISLAND_EXPAND_LEARNED_EVENT, handleIslandExpanded);
-    return () => window.removeEventListener(MOBILE_ISLAND_EXPAND_LEARNED_EVENT, handleIslandExpanded);
+
+    return () => {
+      if (showRafId !== null) window.cancelAnimationFrame(showRafId);
+      if (hideTimer !== null) window.clearTimeout(hideTimer);
+      window.removeEventListener(MOBILE_ISLAND_EXPAND_LEARNED_EVENT, handleIslandExpanded);
+    };
   }, []);
 
   const isDark = mounted ? resolvedTheme === 'dark' : false;
   const stationColor = currentStation?.color || '#8B5CF6';
 
+  // Update theme-color meta tag for iOS PWA navigation bar
   useEffect(() => {
     if (!mounted) return;
     let meta = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement | null;
@@ -391,7 +411,10 @@ export default function Home() {
     <main className="relative min-h-screen overflow-x-hidden">
       {/* 背景 */}
       <div className="fixed inset-0 -z-10 pointer-events-none">
+        {/* 基础底色 */}
         <div className={cn("absolute inset-0 transition-colors duration-700", isDark ? "bg-[#0a0a0c]" : "bg-slate-50")} />
+        
+        {/* 静态柔和渐变 */}
         <div 
           className="absolute inset-0 opacity-40 sm:opacity-50"
           style={{
@@ -400,10 +423,12 @@ export default function Home() {
               : 'radial-gradient(circle at 15% 10%, rgba(139, 92, 246, 0.08) 0%, transparent 40%), radial-gradient(circle at 75% 60%, rgba(6, 182, 212, 0.06) 0%, transparent 45%), radial-gradient(circle at 30% 85%, rgba(236, 72, 153, 0.06) 0%, transparent 40%)'
           }}
         />
+
+        {/* 高级噪点质感 */}
         <div 
           className="absolute inset-0 opacity-[0.03] sm:opacity-[0.04]"
           style={{ 
-            backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")',
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
             mixBlendMode: isDark ? 'overlay' : 'multiply'
           }} 
         />
@@ -413,6 +438,7 @@ export default function Home() {
         }} />
       </div>
 
+      {/* 内容 */}
       <div className="relative z-10">
         <NavBar isDark={isDark} isPlaying={isPlaying} currentStation={currentStation} stationColor={stationColor} onThemeToggle={handleThemeToggle} />
 
@@ -420,6 +446,8 @@ export default function Home() {
         <section className="pt-22 pb-10 sm:pb-14 px-4 sm:px-6">
           <div className="max-w-4xl mx-auto text-center">
             <motion.div initial="hidden" animate="visible" variants={stagger}>
+
+              {/* 标签 */}
               <motion.div variants={fadeInUp} className="mb-6">
                 <a href="https://lofi.88lin.eu.org/" target="_blank" rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium cursor-pointer transition-all hover:scale-105"
@@ -434,10 +462,12 @@ export default function Home() {
                 </a>
               </motion.div>
 
+              {/* 实时时钟 */}
               <motion.div variants={fadeInUp}>
                 <LiveClock isDark={isDark} stationColor={stationColor} isPlaying={isPlaying} />
               </motion.div>
 
+              {/* 标题 */}
               <motion.h1 variants={fadeInUp} className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] mb-5 whitespace-nowrap">
                 <span className={cn(
                   "bg-clip-text text-transparent",
@@ -449,31 +479,25 @@ export default function Home() {
                 </span>
               </motion.h1>
 
+              {/* 描述 */}
               <motion.p variants={fadeInUp} className={cn("text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed", isDark ? "text-white/45" : "text-zinc-500")}>
                 Lofi 音乐被科学认证为最适合专注工作学习的音乐。
                 <br className="hidden sm:block" />
                 macOS 灵动岛设计，{stations.length} 个精选电台，打开即用，无需下载。
               </motion.p>
 
+              {/* 按钮 */}
               <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6 sm:mb-10">
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
                   <Button size="lg" onClick={() => togglePlay()}
-                    className="w-full sm:w-auto rounded-full px-7 h-12 text-base font-semibold shadow-xl"
+                    className="w-full sm:w-48 rounded-full px-10 h-12 text-base font-semibold shadow-xl flex items-center justify-center"
                     style={{ background: 'linear-gradient(135deg, #8B5CF6, #D946EF)', boxShadow: '0 8px 32px rgba(139,92,246,0.35)' }}>
                     {isPlaying ? <><Pause className="w-5 h-5 mr-2" /><span>正在播放</span></> : <><Play className="w-5 h-5 mr-2" /><span>开始播放</span></>}
                   </Button>
                 </motion.div>
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
-                  <Button variant="outline" size="lg" className={cn("w-full sm:w-auto rounded-full px-7 h-12 text-base font-medium group", isDark && "border-white/15 text-white/80 hover:bg-white/[0.07] hover:border-white/25")} asChild>
-                    <a href="https://github.com/88lin/lofi-radio-web" target="_blank" rel="noopener noreferrer">
-                      <Github className="w-5 h-5 mr-2" />
-                      查看源码
-                      <ExternalLink className="w-4 h-4 ml-2 opacity-40 group-hover:opacity-80 transition-opacity" />
-                    </a>
-                  </Button>
-                </motion.div>
               </motion.div>
 
+              {/* 快捷键 - 仅桌面 */}
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7, duration: 0.5 }} className="hidden sm:flex justify-center">
                 <div className={cn("inline-flex items-center gap-4 px-5 py-2.5 rounded-2xl", isDark ? "bg-white/[0.025]" : "bg-black/[0.025]")}>
                   {shortcuts.map((item, i) => (
@@ -508,14 +532,19 @@ export default function Home() {
                           : '0 4px 12px rgba(168,85,247,0.10)'
                       }}
                     >
-                      <span className="text-xs" style={{ color: isDark ? '#F5E8FF' : '#6B21A8' }}>双击灵动岛展开播放器</span>
+                      <span className="text-xs" style={{ color: isDark ? '#F5E8FF' : '#6B21A8' }}>
+                        双击灵动岛展开播放器
+                      </span>
                       <span className="text-xs" style={{ color: isDark ? 'rgba(245,232,255,0.45)' : 'rgba(107,33,168,0.35)' }}>·</span>
-                      <span className="text-xs" style={{ color: isDark ? 'rgba(245,232,255,0.82)' : 'rgba(107,33,168,0.72)' }}>拖动可移动位置</span>
+                      <span className="text-xs" style={{ color: isDark ? 'rgba(245,232,255,0.82)' : 'rgba(107,33,168,0.72)' }}>
+                        拖动可移动位置
+                      </span>
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
 
+              {/* 正在播放 */}
               <AnimatePresence>
                 {isPlaying && currentStation && (
                   <motion.div initial={{ opacity: 0, y: 12, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 12, scale: 0.95 }}
@@ -528,8 +557,8 @@ export default function Home() {
                         <Music4 className="w-3.5 h-3.5" style={{ color: stationColor }} />
                       </motion.div>
                       <div className="flex flex-col">
-                        <span className={cn("text-xs font-semibold text-left", isDark ? "text-white" : "text-zinc-900")}>正在播放</span>
-                        <span className={cn("text-[10px] text-left", isDark ? "text-white/45" : "text-zinc-500")}>{currentStation.name}</span>
+                        <span className={cn("text-xs font-semibold", isDark ? "text-white" : "text-zinc-900")}>正在播放</span>
+                        <span className={cn("text-[10px]", isDark ? "text-white/45" : "text-zinc-500")}>{currentStation.name}</span>
                       </div>
                       <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: `${stationColor}20`, color: stationColor }}>{currentStation.style1}</span>
                       <motion.div className="w-1.5 h-1.5 rounded-full" style={{ background: stationColor }} animate={{ scale: [1, 1.5, 1], opacity: [1, 0.4, 1] }} transition={{ duration: 1.2, repeat: Infinity }} />
@@ -538,6 +567,7 @@ export default function Home() {
                 )}
               </AnimatePresence>
 
+              {/* 状态统计 */}
               <AnimatePresence>
                 {(focusTime > 0 || remainingSeconds !== null) && (
                   <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }} className="mt-4 flex flex-wrap justify-center gap-3">
@@ -560,6 +590,7 @@ export default function Home() {
                   </motion.div>
                 )}
               </AnimatePresence>
+
             </motion.div>
           </div>
         </section>
@@ -572,9 +603,7 @@ export default function Home() {
               <p className={cn("text-base sm:text-lg max-w-xl mx-auto", isDark ? "text-white/38" : "text-zinc-500")}>专为专注设计，让音乐成为你工作和学习的最佳伴侣</p>
             </motion.div>
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {features.map((f) => (
-                <FeatureCard key={f.title} feature={f} isDark={isDark} />
-              ))}
+              {features.map((f) => <FeatureCard key={f.title} feature={f} isDark={isDark} />)}
             </motion.div>
           </div>
         </section>
@@ -587,9 +616,7 @@ export default function Home() {
               <p className={cn("text-base sm:text-lg", isDark ? "text-white/38" : "text-zinc-500")}>无论学习、工作还是放松，总有一个电台适合你</p>
             </motion.div>
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-              {scenes.map((s) => (
-                <SceneCard key={s.title} scene={s} isDark={isDark} onClick={() => handleSceneClick(s.id)} />
-              ))}
+              {scenes.map((s) => <SceneCard key={s.title} scene={s} isDark={isDark} onClick={() => handleSceneClick(s.id)} />)}
             </motion.div>
           </div>
         </section>
@@ -622,6 +649,8 @@ export default function Home() {
               background: isDark ? 'linear-gradient(135deg, rgba(139,92,246,0.1), rgba(217,70,239,0.05))' : 'linear-gradient(135deg, rgba(139,92,246,0.07), rgba(217,70,239,0.03))',
               border: isDark ? '1px solid rgba(139,92,246,0.18)' : '1px solid rgba(139,92,246,0.12)',
             }}>
+              <div className="absolute top-6 right-8 w-24 h-24 rounded-full blur-2xl opacity-20" style={{ background: 'radial-gradient(circle, #8B5CF6, transparent)' }} />
+              <div className="absolute bottom-4 left-6 w-16 h-16 rounded-full blur-xl opacity-15" style={{ background: 'radial-gradient(circle, #EC4899, transparent)' }} />
               <h2 className={cn("text-2xl sm:text-3xl font-bold mb-3 relative", isDark ? "text-white" : "text-zinc-900")}>开始你的专注之旅</h2>
               <p className={cn("text-sm sm:text-base mb-8 relative max-w-xl mx-auto leading-relaxed", isDark ? "text-white/45" : "text-zinc-500")}>
                 无需注册，无需下载，打开网页即可享受高品质的专注音乐。让 Lofi Radio 成为你每天工作学习的最佳伴侣。
@@ -637,24 +666,56 @@ export default function Home() {
           </motion.div>
         </section>
 
-        {/* FAQ Section */}
         <section className="py-6 sm:py-10 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto">
             <motion.div initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="text-center mb-8 sm:mb-10">
               <div className="mb-3 flex justify-center">
-                <span className={cn("inline-flex items-center rounded-full px-3 py-1 text-[11px] sm:text-xs font-semibold tracking-[0.18em] uppercase", isDark ? "bg-white/[0.05] text-white/45 border border-white/[0.07]" : "bg-black/[0.03] text-zinc-500 border border-black/[0.05]")}>FAQ</span>
+                <span
+                  className={cn(
+                    "inline-flex items-center rounded-full px-3 py-1 text-[11px] sm:text-xs font-semibold tracking-[0.18em] uppercase",
+                    isDark ? "bg-white/[0.05] text-white/45 border border-white/[0.07]" : "bg-black/[0.03] text-zinc-500 border border-black/[0.05]"
+                  )}
+                >
+                  FAQ
+                </span>
               </div>
               <h2 className={cn("text-2xl sm:text-3xl font-bold mb-3", isDark ? "text-white" : "text-zinc-900")}>Lofi Radio 常见问题</h2>
+              <p className={cn("text-sm sm:text-base max-w-3xl mx-auto leading-relaxed", isDark ? "text-white/38" : "text-zinc-500")}>把使用时最容易遇到的几个问题整理在这里，既方便第一次打开网站时快速了解，也能帮你更快找到适合自己的收听方式和使用场景。</p>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className={cn("rounded-[28px] p-3 sm:p-4 border", isDark ? "bg-white/[0.03] border-white/[0.06]" : "bg-white/90 border-black/[0.05]")}>
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.45 }}
+              className={cn(
+                "rounded-[28px] p-3 sm:p-4 border overflow-hidden",
+                isDark
+                  ? "bg-white/[0.03] border-white/[0.06] shadow-[0_24px_80px_rgba(0,0,0,0.28)]"
+                  : "bg-white/90 border-black/[0.05] shadow-[0_20px_60px_rgba(15,23,42,0.08)]"
+              )}
+            >
               <Accordion type="single" collapsible className="w-full">
                 {homepageFaqs.map((faq, index) => (
-                  <AccordionItem key={index} value={`faq-${index}`} className={cn("rounded-[22px] border mb-2 px-4 sm:px-6", isDark ? "border-white/[0.07] bg-white/[0.02]" : "border-black/[0.04] bg-black/[0.02]")}>
-                    <AccordionTrigger className={cn("min-h-12 py-4 text-sm sm:text-base font-semibold", isDark ? "text-white/88" : "text-zinc-900")}>
-                      <span>{faq.question}</span>
+                  <AccordionItem
+                    key={faq.question}
+                    value={`faq-${index}`}
+                    className={cn(
+                      "rounded-[22px] border mb-2 last:mb-0 px-4 sm:px-6 transition-colors",
+                      isDark
+                        ? "border-white/[0.07] bg-white/[0.02] hover:bg-white/[0.035] data-[state=open]:bg-white/[0.04]"
+                        : "border-black/[0.04] bg-black/[0.02] hover:bg-black/[0.03] data-[state=open]:bg-black/[0.03]"
+                    )}
+                  >
+                    <AccordionTrigger
+                      className={cn(
+                        "min-h-12 py-4 sm:py-5 text-sm sm:text-base font-semibold no-underline hover:no-underline [&>svg]:size-3 [&>svg]:shrink-0 gap-0.5 sm:gap-4",
+                        isDark ? "text-white/88" : "text-zinc-900"
+                      )}
+                    >
+                      <span className="leading-6">{faq.question}</span>
                     </AccordionTrigger>
-                    <AccordionContent className={cn("pb-4 text-sm leading-7", isDark ? "text-white/52" : "text-zinc-600")}>
+                    <AccordionContent className={cn("pb-4 sm:pb-6 text-sm sm:text-[15px] leading-7 sm:leading-8 pr-2 sm:pr-10 max-w-none text-justify", isDark ? "text-white/52" : "text-zinc-600")}>
                       {faq.answer}
                     </AccordionContent>
                   </AccordionItem>
@@ -664,20 +725,33 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Footer */}
-        <footer className={cn("py-8 px-4 border-t", isDark ? "border-white/5" : "border-zinc-100")}>
-          <div className="max-w-5xl mx-auto flex justify-center items-center gap-4 text-sm">
-            <a href="https://github.com/88lin/lofi-radio-web" target="_blank" rel="noopener noreferrer" className={cn("flex items-center gap-1.5", isDark ? "text-white/50 hover:text-white/80" : "text-zinc-500 hover:text-zinc-800")}>
-              <Github className="w-4 h-4" /><span>GitHub</span>
-            </a>
-            <span className={cn(isDark ? "text-white/20" : "text-zinc-300")}>·</span>
-            <span className={cn("font-semibold", isDark ? "text-violet-400" : "text-violet-600")}>
-              Made with ❤️ by <a href="https://blog.88lin.eu.org/" target="_blank" rel="noopener noreferrer" className="hover:underline">茉灵智库</a>
-            </span>
+        {/* 底部 */}
+        <footer className={cn(
+          "py-8 px-4 sm:px-6",
+          isDark ? "border-t border-white/5" : "border-t border-zinc-100"
+        )}>
+          <div className="max-w-5xl mx-auto">
+            <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
+              <span className={cn(
+                "font-semibold",
+                isDark ? "text-violet-400" : "text-violet-600"
+              )}>
+                Made with ❤️ by{' '}
+                <a 
+                  href="https://blog.88lin.eu.org/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="hover:underline"
+                >
+                  茉灵智库
+                </a>
+              </span>
+            </div>
           </div>
         </footer>
       </div>
       
+      {/* 浮动播放器 */}
       <FloatingPlayer />
     </main>
   );
