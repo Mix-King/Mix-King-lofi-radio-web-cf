@@ -317,7 +317,7 @@ const LiveClock = memo(({ isDark, stationColor, isPlaying }: { isDark: boolean; 
               )}>
                 Made with ❤️ by{' '}
                 <a 
-                  href="https://blog.88lin.eu.org/" 
+                  href="https://blog.zouze.com/" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="hover:underline"
