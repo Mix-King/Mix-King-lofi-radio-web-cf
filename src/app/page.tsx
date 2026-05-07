@@ -2,7 +2,7 @@
 
 import { useEffect, useSyncExternalStore, useCallback, memo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sun, Moon, Github, Sparkles, Play, Pause, ExternalLink, Waves, Music4, ChevronRight, Radio, Clock3 } from 'lucide-react';
+import { Sun, Moon, Sparkles, Play, Pause, ExternalLink, Waves, Music4, ChevronRight, Radio, Clock3 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { FloatingPlayer } from '@/components/lofi/floating-player';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
@@ -207,12 +207,6 @@ const NavBar = memo(({ isDark, isPlaying, currentStation, stationColor, onThemeT
           )}
         </AnimatePresence>
       </motion.button>
-
-      <motion.a href="https://github.com/88lin/lofi-radio-web" target="_blank" rel="noopener noreferrer"
-        className={cn("hidden sm:flex w-7 h-7 rounded-full items-center justify-center transition-colors", isDark ? "text-white/60 hover:text-white hover:bg-white/10" : "text-zinc-500 hover:text-zinc-900 hover:bg-black/5")}
-        whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-        <Github className="w-3.5 h-3.5" />
-      </motion.a>
     </div>
   </motion.nav>
 ));
@@ -434,7 +428,7 @@ export default function Home() {
         <div 
           className="absolute inset-0 opacity-[0.03] sm:opacity-[0.04]"
           style={{ 
-            backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")',
+            backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")',
             mixBlendMode: isDark ? 'overlay' : 'multiply'
           }} 
         />
@@ -496,18 +490,9 @@ export default function Home() {
               <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6 sm:mb-10">
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
                   <Button size="lg" onClick={() => togglePlay()}
-                    className="w-full sm:w-auto rounded-full px-7 h-12 text-base font-semibold shadow-xl"
+                    className="w-full sm:w-48 rounded-full px-10 h-12 text-base font-semibold shadow-xl flex items-center justify-center"
                     style={{ background: 'linear-gradient(135deg, #8B5CF6, #D946EF)', boxShadow: '0 8px 32px rgba(139,92,246,0.35)' }}>
                     {isPlaying ? <><Pause className="w-5 h-5 mr-2" /><span>正在播放</span></> : <><Play className="w-5 h-5 mr-2" /><span>开始播放</span></>}
-                  </Button>
-                </motion.div>
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
-                  <Button variant="outline" size="lg" className={cn("w-full sm:w-auto rounded-full px-7 h-12 text-base font-medium group", isDark && "border-white/15 text-white/80 hover:bg-white/[0.07] hover:border-white/25")} asChild>
-                    <a href="https://github.com/88lin/lofi-radio-web" target="_blank" rel="noopener noreferrer">
-                      <Github className="w-5 h-5 mr-2" />
-                      查看源码
-                      <ExternalLink className="w-4 h-4 ml-2 opacity-40 group-hover:opacity-80 transition-opacity" />
-                    </a>
                   </Button>
                 </motion.div>
               </motion.div>
@@ -747,21 +732,6 @@ export default function Home() {
         )}>
           <div className="max-w-5xl mx-auto">
             <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
-              <a
-                href="https://github.com/88lin/lofi-radio-web"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={cn(
-                  "flex items-center gap-1.5 transition-colors",
-                  isDark ? "text-white/50 hover:text-white/80" : "text-zinc-500 hover:text-zinc-800"
-                )}
-              >
-                <Github className="w-4 h-4" />
-                <span>GitHub</span>
-              </a>
-              
-              <span className={cn(isDark ? "text-white/20" : "text-zinc-300")}>·</span>
-              
               <span className={cn(
                 "font-semibold",
                 isDark ? "text-violet-400" : "text-violet-600"
