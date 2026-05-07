@@ -17,7 +17,7 @@ export const stations: Station[] = [
   name: 'Lofi Girl',
   scene: '学习',
   type: 'mp3',                             // ← 改成 mp3
-  url: 'https://cdn.pixabay.com/audio/2026/04/14/audio_fd85ad03a4.mp3',  // ← 你的新音频
+  url: 'https://boxradio-edge-00.streamafrica.net/lofi',  // ← 你的新音频
   style1: 'Lofi',
   style2: 'Chill',
   // custom: 'B站',
@@ -28,7 +28,7 @@ export const stations: Station[] = [
     name: 'Lofi Box',
     scene: '学习',
     type: 'mp3',
-    url: 'https://boxradio-edge-00.streamafrica.net/lofi',
+    url: 'https://cdn.pixabay.com/audio/2026/04/14/audio_fd85ad03a4.mp3',
     style1: 'Lofi',
     style2: 'Chill',
     // custom: '高性能',
