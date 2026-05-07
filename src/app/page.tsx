@@ -484,8 +484,8 @@ export default function Home() {
         <section className="pt-22 pb-8 sm:pb-12 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto">
             <motion.div initial="hidden" animate="visible" variants={stagger}>
-              <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_360px] lg:items-start">
-                <div className="text-center lg:text-left">
+              <div className="max-w-4xl mx-auto text-center">
+                <div>
                   <motion.div variants={fadeInUp} className="mb-5 flex justify-center lg:justify-start">
                     <a href="https://lofi.zouze.com/" target="_blank" rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium cursor-pointer transition-all hover:scale-[1.02]"
@@ -515,11 +515,11 @@ export default function Home() {
                     </span>
                   </motion.h1>
 
-                  <motion.p variants={fadeInUp} className={cn("text-base sm:text-lg md:text-xl max-w-2xl lg:max-w-xl lg:mx-0 mx-auto mb-8 leading-relaxed", isDark ? "text-white/50" : "text-zinc-600")}>
+                  <motion.p variants={fadeInUp} className={cn("text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-8 leading-relaxed", isDark ? "text-white/50" : "text-zinc-600")}>
                     精简界面、即开即听，把 Lo-fi、电台、专注计时和睡眠定时整合到一个更克制的收听首页里。
                   </motion.p>
 
-                  <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-3 mb-6">
+                  <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
                     <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
                       <Button size="lg" onClick={togglePlay}
                         className="w-full sm:w-48 rounded-full px-10 h-12 text-base font-semibold shadow-xl flex items-center justify-center"
@@ -540,12 +540,12 @@ export default function Home() {
                     </Button>
                   </motion.div>
 
-                  <motion.div variants={fadeInUp} className="grid grid-cols-3 gap-3 max-w-xl mx-auto lg:mx-0">
+                  <motion.div variants={fadeInUp} className="grid grid-cols-3 gap-3 max-w-xl mx-auto">
                     {heroStats.map((item) => (
                       <div
                         key={item.label}
                         className={cn(
-                          "rounded-2xl px-4 py-4 text-center lg:text-left border backdrop-blur-xl",
+                          "rounded-2xl px-4 py-4 text-center border backdrop-blur-xl",
                           isDark ? "bg-white/[0.03] border-white/[0.06]" : "bg-white/70 border-black/[0.04]"
                         )}
                       >
@@ -555,7 +555,7 @@ export default function Home() {
                     ))}
                   </motion.div>
 
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7, duration: 0.5 }} className="hidden sm:flex justify-center lg:justify-start mt-6">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7, duration: 0.5 }} className="hidden sm:flex justify-center mt-6">
                     <div className={cn("inline-flex flex-wrap items-center gap-3 px-4 py-2.5 rounded-2xl", isDark ? "bg-white/[0.025] border border-white/[0.05]" : "bg-black/[0.025] border border-black/[0.04]")}>
                       {shortcuts.map((item, i) => (
                         <div key={i} className="flex items-center gap-1.5">
@@ -567,40 +567,38 @@ export default function Home() {
                   </motion.div>
                 </div>
 
-                <motion.div variants={fadeInUp} className="relative">
+                <motion.div variants={fadeInUp} className="relative mt-8">
                   <div className={cn(
                     "relative rounded-[32px] p-5 sm:p-6 border overflow-hidden backdrop-blur-2xl",
                     isDark ? "bg-white/[0.035] border-white/[0.06]" : "bg-white/78 border-black/[0.05]"
                   )}>
                     <div className="absolute inset-x-8 top-0 h-px" style={{ background: `linear-gradient(90deg, transparent, ${stationColor}, transparent)` }} />
-                    <div className="flex justify-center lg:justify-start">
+                    <div className="flex justify-center">
                       <LiveClock isDark={isDark} stationColor={stationColor} isPlaying={isPlaying} />
                     </div>
 
                     <div className="-mt-2 space-y-3">
                       <div className={cn(
-                        "rounded-2xl p-4 border",
+                        "rounded-2xl p-4 border text-left",
                         isDark ? "bg-black/20 border-white/[0.06]" : "bg-white/80 border-black/[0.05]"
                       )}>
                         <div className="flex items-center justify-between gap-3">
-                          <div>
-                            <p className={cn("text-xs uppercase tracking-[0.22em]", isDark ? "text-white/32" : "text-zinc-400")}>Now Playing</p>
-                            <h3 className={cn("mt-1 text-sm font-semibold", isDark ? "text-white/90" : "text-zinc-900")}>
-                              {currentStation?.name || '选择一个电台开始收听'}
-                            </h3>
-                            <p className={cn("mt-1 text-xs", isDark ? "text-white/38" : "text-zinc-500")}>
-                              {currentStation ? `${currentStation.style1}${currentStation.custom ? ` · ${currentStation.custom}` : ''}` : '支持专注、阅读、编程与助眠场景'}
-                            </p>
-                          </div>
+                          <p className={cn("text-xs uppercase tracking-[0.22em]", isDark ? "text-white/32" : "text-zinc-400")}>Now Playing</p>
                           <div className="flex items-center gap-2">
                             <div className="w-2 h-2 rounded-full" style={{ background: isPlaying ? stationColor : (isDark ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.18)'), boxShadow: isPlaying ? `0 0 12px ${stationColor}` : 'none' }} />
                             <span className={cn("text-xs font-medium", isDark ? "text-white/45" : "text-zinc-500")}>{isPlaying ? '播放中' : '待播放'}</span>
                           </div>
                         </div>
+                        <h3 className={cn("mt-2 text-sm sm:text-base font-semibold", isDark ? "text-white/90" : "text-zinc-900")}>
+                          {currentStation?.name || '选择一个电台开始收听'}
+                        </h3>
+                        <p className={cn("mt-1 text-xs sm:text-sm", isDark ? "text-white/38" : "text-zinc-500")}>
+                          {currentStation ? `${currentStation.style1}${currentStation.custom ? ` · ${currentStation.custom}` : ''}` : '支持专注、阅读、编程与助眠场景'}
+                        </p>
                       </div>
 
                       {(focusTime > 0 || remainingSeconds !== null) && (
-                        <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="grid gap-3 sm:grid-cols-2 text-left">
                           {focusTime > 0 && (
                             <div className="rounded-2xl px-4 py-3" style={{ background: isDark ? `${stationColor}12` : `${stationColor}08`, border: `1px solid ${stationColor}20` }}>
                               <div className="flex items-center gap-2 mb-1.5">
@@ -665,7 +663,7 @@ export default function Home() {
               <AnimatePresence>
                 {isPlaying && currentStation && (
                   <motion.div initial={{ opacity: 0, y: 12, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 12, scale: 0.95 }}
-                    transition={{ type: 'spring', damping: 22 }} className="mt-6 flex justify-center lg:justify-start">
+                    transition={{ type: 'spring', damping: 22 }} className="mt-6 flex justify-center">
                     <motion.div className="inline-flex items-center gap-3 px-4 py-2.5 rounded-full cursor-pointer"
                       style={{ background: isDark ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.92)', backdropFilter: 'blur(16px)', border: `1px solid ${stationColor}25`, boxShadow: `0 4px 20px ${stationColor}15` }}
                       onClick={() => setMiniMode(false)} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
