@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useSyncExternalStore, useCallback, memo, useState } from 'react';
+import { useEffect, useSyncExternalStore, useCallback, memo, useState, type CSSProperties } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sun, Moon, Sparkles, Play, Pause, ExternalLink, Waves, Music4, ChevronRight, Radio, Clock3 } from 'lucide-react';
 import { useTheme } from 'next-themes';
@@ -19,6 +19,38 @@ import { homepageFaqs } from '@/lib/seo-content';
 
 function useMounted() {
   return useSyncExternalStore(() => () => {}, () => true, () => false);
+}
+
+const IGNORE_HOTKEY_TARGETS = ['INPUT', 'TEXTAREA', 'SELECT'];
+const HERO_CTA_STYLE: CSSProperties = {
+  background: 'linear-gradient(135deg, #8B5CF6, #D946EF)',
+  boxShadow: '0 8px 32px rgba(139,92,246,0.35)',
+};
+const CTA_BUTTON_STYLE: CSSProperties = {
+  background: 'linear-gradient(135deg, #8B5CF6, #D946EF)',
+  boxShadow: '0 8px 32px rgba(139,92,246,0.4)',
+};
+
+function getThemeMetaColor(isDark: boolean) {
+  return isDark ? '#0a0a0c' : '#f8fafc';
+}
+
+function formatFocusTime(totalMinutes: number) {
+  if (totalMinutes < 60) {
+    return `${totalMinutes} 分钟`;
+  }
+
+  return `${Math.floor(totalMinutes / 60)} 小时 ${totalMinutes % 60} 分钟`;
+}
+
+function formatRemainingTime(totalSeconds: number) {
+  return `${Math.floor(totalSeconds / 60).toString().padStart(2, '0')}:${(totalSeconds % 60).toString().padStart(2, '0')}`;
+}
+
+function canHandleHotkey(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) return true;
+  if (target.isContentEditable) return false;
+  return !IGNORE_HOTKEY_TARGETS.includes(target.tagName);
 }
 
 // ==================== 实时时钟 Hook ====================
@@ -167,7 +199,7 @@ const NavBar = memo(({ isDark, isPlaying, currentStation, stationColor, onThemeT
       )}
       style={{ boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.07)' : '0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9)' }}
     >
-      <a href="https://lofi.zouze.com/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-2 py-1 hover:opacity-80 transition-opacity">
+      <a href="https://lofi.88lin.eu.org/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-2 py-1 hover:opacity-80 transition-opacity">
         <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #8B5CF6, #D946EF, #EC4899)', boxShadow: '0 2px 8px rgba(139,92,246,0.45)' }}>
           <Music4 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />
         </div>
@@ -330,15 +362,15 @@ export default function Home() {
 
   const handleStationClick = useCallback((id: string) => { selectStationById(id); setMiniMode(false); }, [selectStationById, setMiniMode]);
   const handleSceneClick = useCallback((sceneId: string) => {
-    const s = stations.filter(s => s.scene === sceneId);
-    if (s.length > 0) { setSelectedCategory(sceneId); selectStationById(s[0].id); setMiniMode(false); }
+    const station = stations.find((item) => item.scene === sceneId);
+    if (station) { setSelectedCategory(sceneId); selectStationById(station.id); setMiniMode(false); }
   }, [selectStationById, setMiniMode, setSelectedCategory]);
   const handleThemeToggle = useCallback(() => { setTheme(theme === 'dark' ? 'light' : 'dark'); }, [theme, setTheme]);
   const togglePlay = useCallback(() => { if (userWantsPlay) requestPause(); else requestPlay(); }, [userWantsPlay, requestPlay, requestPause]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (!canHandleHotkey(e.target)) return;
       switch (e.code) {
         case 'Space': e.preventDefault(); togglePlay(); break;
         case 'ArrowLeft': e.preventDefault(); prevStation(); break;
@@ -404,7 +436,7 @@ export default function Home() {
       meta.name = 'theme-color';
       document.head.appendChild(meta);
     }
-    meta.content = isDark ? '#0a0a0c' : '#f8fafc';
+    meta.content = getThemeMetaColor(isDark);
   }, [isDark, mounted]);
 
   return (
@@ -449,7 +481,7 @@ export default function Home() {
 
               {/* 标签 */}
               <motion.div variants={fadeInUp} className="mb-6">
-                <a href="https://lofi.zouze.com/" target="_blank" rel="noopener noreferrer"
+                <a href="https://lofi.88lin.eu.org/" target="_blank" rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium cursor-pointer transition-all hover:scale-105"
                   style={{
                     background: isDark ? 'rgba(139,92,246,0.12)' : 'rgba(139,92,246,0.07)',
@@ -489,9 +521,9 @@ export default function Home() {
               {/* 按钮 */}
               <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6 sm:mb-10">
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
-                  <Button size="lg" onClick={() => togglePlay()}
+                  <Button size="lg" onClick={togglePlay}
                     className="w-full sm:w-48 rounded-full px-10 h-12 text-base font-semibold shadow-xl flex items-center justify-center"
-                    style={{ background: 'linear-gradient(135deg, #8B5CF6, #D946EF)', boxShadow: '0 8px 32px rgba(139,92,246,0.35)' }}>
+                    style={HERO_CTA_STYLE}>
                     {isPlaying ? <><Pause className="w-5 h-5 mr-2" /><span>正在播放</span></> : <><Play className="w-5 h-5 mr-2" /><span>开始播放</span></>}
                   </Button>
                 </motion.div>
@@ -575,7 +607,7 @@ export default function Home() {
                       <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full" style={{ background: isDark ? `${stationColor}12` : `${stationColor}08`, border: `1px solid ${stationColor}20` }}>
                         <Clock3 className="w-3 h-3" style={{ color: stationColor }} />
                         <span className="text-xs font-medium" style={{ color: stationColor }}>
-                          今日专注 {focusTime < 60 ? `${focusTime} 分钟` : `${Math.floor(focusTime / 60)} 小时 ${focusTime % 60} 分钟`}
+                          今日专注 {formatFocusTime(focusTime)}
                         </span>
                       </div>
                     )}
@@ -583,7 +615,7 @@ export default function Home() {
                       <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full" style={{ background: isDark ? `${stationColor}12` : `${stationColor}08`, border: `1px solid ${stationColor}20` }}>
                         <Moon className="w-3 h-3" style={{ color: stationColor }} />
                         <span className="text-xs font-medium tabular-nums" style={{ color: stationColor }}>
-                          即将睡眠 {Math.floor(remainingSeconds / 60).toString().padStart(2, '0')}:{(remainingSeconds % 60).toString().padStart(2, '0')}
+                          即将睡眠 {formatRemainingTime(remainingSeconds)}
                         </span>
                       </div>
                     )}
@@ -658,7 +690,7 @@ export default function Home() {
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="relative inline-block">
                 <Button size="lg" onClick={() => { togglePlay(); if (!userWantsPlay) setMiniMode(false); }}
                   className="rounded-full px-8 h-12 text-base font-semibold shadow-xl"
-                  style={{ background: 'linear-gradient(135deg, #8B5CF6, #D946EF)', boxShadow: '0 8px 32px rgba(139,92,246,0.4)' }}>
+                  style={CTA_BUTTON_STYLE}>
                   {userWantsPlay ? <><Pause className="w-5 h-5 mr-2" />{isLoading ? '加载中...' : '正在播放'}</> : <><Play className="w-5 h-5 mr-2" />立即开始</>}
                 </Button>
               </motion.div>
