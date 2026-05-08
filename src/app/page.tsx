@@ -152,27 +152,27 @@ const shortcuts = [
 ];
 
 const trustStats = [
-  { label: '沉浸声场', value: '24/7', description: '全天候在线陪伴' },
-  { label: '场景覆盖', value: `${stations.length}+`, description: '学习 / 编程 / 阅读 / 助眠' },
-  { label: '极简操作', value: '1 Tap', description: '打开网页即可开始播放' },
+  { label: '在线', value: '24/7', description: '随时可听' },
+  { label: '电台', value: `${stations.length}+`, description: '多场景覆盖' },
+  { label: '启动', value: '1 Tap', description: '打开即播' },
 ];
 
 const listeningModes = [
-  { title: 'Focus Flow', description: '弱化干扰信息，让播放与专注状态成为主角。', color: '#8B5CF6' },
-  { title: 'Soft Energy', description: '用轻亮的点缀色强化节奏感，但保持文字可读性。', color: '#06B6D4' },
-  { title: 'Night Cocoon', description: '夜间氛围更柔和，降低刺眼高对比造成的疲劳。', color: '#EC4899' },
+  { title: 'Lo‑fi', description: '低干扰', color: '#8B5CF6' },
+  { title: 'Chill', description: '轻松进入状态', color: '#06B6D4' },
+  { title: 'Sleep', description: '夜间更柔和', color: '#EC4899' },
 ];
 
 const heroPillars = [
-  { label: '视觉语言', value: 'Glass / Quiet / Precision' },
-  { label: '交互原则', value: '保持播放器核心逻辑原样' },
-  { label: '使用状态', value: '更适合长期打开与陪伴式收听' },
+  { label: '界面', value: '轻玻璃' },
+  { label: '操作', value: '不改核心' },
+  { label: '氛围', value: '更像音乐产品' },
 ];
 
 const productHighlights = [
-  { title: '一个页面，进入专注状态', description: '打开即播、无需学习成本，把视觉噪音压低，把音乐与状态前置。 ' },
-  { title: '像桌面产品，而不是普通网页', description: '通过更强留白、低饱和中性色和玻璃结构，让界面更接近 Apple 风的静谧质感。' },
-  { title: '所有改动都围绕安全升级', description: '不触碰核心能力，只重写呈现方式，让功能可用性和高级感同时保住。' },
+  { title: '打开就听', description: '更直接。' },
+  { title: '更像播放器', description: '少一点网页感。' },
+  { title: '核心不动', description: '只改界面层。' },
 ];
 
 // 导航栏组件 - 药丸胶囊形式 + 高斯模糊
@@ -188,9 +188,9 @@ const NavBar = memo(({ isDark, isPlaying, currentStation, stationColor, onThemeT
     <div
       className={cn(
         "flex items-center gap-1 px-2 py-1.5 rounded-full backdrop-blur-2xl shadow-2xl",
-        isDark ? "bg-zinc-900/65 border border-white/[0.09]" : "bg-white/75 border border-black/[0.05]"
+        isDark ? "bg-slate-900/62 border border-white/[0.09]" : "bg-white/72 border border-slate-200/70"
       )}
-      style={{ boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.07)' : '0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9)' }}
+      style={{ boxShadow: isDark ? '0 8px 32px rgba(3,7,18,0.45), inset 0 1px 0 rgba(255,255,255,0.07)' : '0 12px 40px rgba(148,163,184,0.12), inset 0 1px 0 rgba(255,255,255,0.92)' }}
     >
       <a href="https://lofi.88lin.eu.org/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-2 py-1 hover:opacity-80 transition-opacity">
         <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #8B5CF6, #D946EF, #EC4899)', boxShadow: '0 2px 8px rgba(139,92,246,0.45)' }}>
@@ -348,13 +348,13 @@ const GlassPanel = memo(({ isDark, className, children }: { isDark: boolean; cla
       'relative overflow-hidden border backdrop-blur-2xl',
       isDark
         ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.025))] border-white/[0.08]'
-        : 'bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(255,255,255,0.72))] border-black/[0.06]',
+        : 'bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(248,250,252,0.76))] border-slate-200/70',
       className,
     )}
     style={{
       boxShadow: isDark
         ? '0 24px 120px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.06)'
-        : '0 24px 90px rgba(15,23,42,0.08), inset 0 1px 0 rgba(255,255,255,0.95)',
+        : '0 24px 90px rgba(148,163,184,0.14), inset 0 1px 0 rgba(255,255,255,0.95)',
     }}
   >
     {children}
@@ -501,15 +501,15 @@ export default function Home() {
       {/* 背景 */}
       <div className="fixed inset-0 -z-10 pointer-events-none">
         {/* 基础底色 */}
-        <div className={cn("absolute inset-0 transition-colors duration-700", isDark ? "bg-[#0a0a0c]" : "bg-slate-50")} />
+        <div className={cn("absolute inset-0 transition-colors duration-700", isDark ? "bg-[#070b14]" : "bg-[#f3f6fb]")} />
         
         {/* 静态柔和渐变 */}
         <div 
           className="absolute inset-0 opacity-40 sm:opacity-50"
           style={{
             background: isDark 
-              ? 'radial-gradient(circle at 15% 10%, rgba(139, 92, 246, 0.15) 0%, transparent 40%), radial-gradient(circle at 75% 60%, rgba(6, 182, 212, 0.12) 0%, transparent 45%), radial-gradient(circle at 30% 85%, rgba(236, 72, 153, 0.12) 0%, transparent 40%)'
-              : 'radial-gradient(circle at 15% 10%, rgba(139, 92, 246, 0.08) 0%, transparent 40%), radial-gradient(circle at 75% 60%, rgba(6, 182, 212, 0.06) 0%, transparent 45%), radial-gradient(circle at 30% 85%, rgba(236, 72, 153, 0.06) 0%, transparent 40%)'
+              ? 'radial-gradient(circle at 15% 12%, rgba(96, 165, 250, 0.16) 0%, transparent 38%), radial-gradient(circle at 78% 18%, rgba(192, 132, 252, 0.15) 0%, transparent 40%), radial-gradient(circle at 55% 82%, rgba(45, 212, 191, 0.12) 0%, transparent 42%)'
+              : 'radial-gradient(circle at 15% 12%, rgba(125, 211, 252, 0.28) 0%, transparent 36%), radial-gradient(circle at 80% 18%, rgba(196, 181, 253, 0.28) 0%, transparent 38%), radial-gradient(circle at 55% 82%, rgba(167, 243, 208, 0.22) 0%, transparent 40%)'
           }}
         />
 
@@ -574,7 +574,7 @@ export default function Home() {
                               border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(15,23,42,0.05)',
                             }}>
                             <Sparkles className="w-3.5 h-3.5" />
-                            Quiet Luxury Interface
+                            Now Playing
                           </div>
                           <a href="https://lofi.88lin.eu.org/" target="_blank" rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[11px] sm:text-xs font-medium transition-all hover:scale-[1.02]"
@@ -583,20 +583,19 @@ export default function Home() {
                               color: isDark ? '#e9d5ff' : '#52525b',
                               border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(15,23,42,0.05)',
                             }}>
-                            网页版实时可用
+                            Live Web Radio
                             <ExternalLink className="w-3 h-3 opacity-70" />
                           </a>
                         </div>
 
                         <motion.h1 variants={fadeInUp} className={cn('text-[38px] sm:text-[54px] md:text-[66px] lg:text-[82px] leading-[0.92] tracking-[-0.06em] font-semibold mb-6', isDark ? 'text-white' : 'text-zinc-950')}>
-                          把 Lo‑fi 电台
+                          Music for
                           <br className="hidden sm:block" />
-                          做成一块安静的玻璃屏幕
+                          focus & calm
                         </motion.h1>
 
-                        <motion.p variants={fadeInUp} className={cn('text-[15px] sm:text-[17px] md:text-[19px] leading-8 sm:leading-9 max-w-2xl mb-8', isDark ? 'text-white/50' : 'text-zinc-600')}>
-                          保留你现在这套页面的播放、切台、计时和睡眠功能，
-                          但把整体视觉重做成更接近 Apple 官网和原生产品页的感觉：更少装饰，更强结构，更耐看。
+                        <motion.p variants={fadeInUp} className={cn('text-[15px] sm:text-[17px] md:text-[19px] leading-8 sm:leading-9 max-w-xl mb-8', isDark ? 'text-white/50' : 'text-zinc-600')}>
+                          打开即听。安静、轻盈、适合长时间挂着。
                         </motion.p>
 
                         <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-8">
@@ -607,18 +606,18 @@ export default function Home() {
                               color: isDark ? '#09090b' : '#ffffff',
                               boxShadow: isDark ? '0 14px 30px rgba(255,255,255,0.08)' : '0 18px 36px rgba(15,23,42,0.16)',
                             }}>
-                            {isPlaying ? <><Pause className="w-5 h-5 mr-2" /><span>{isLoading ? '加载中...' : '暂停收听'}</span></> : <><Play className="w-5 h-5 mr-2" /><span>立即进入专注</span></>}
+                            {isPlaying ? <><Pause className="w-5 h-5 mr-2" /><span>{isLoading ? '加载中...' : '暂停'}</span></> : <><Play className="w-5 h-5 mr-2" /><span>播放</span></>}
                           </Button>
                           <Button variant="outline" size="lg" onClick={() => setMiniMode(false)}
                             className={cn('w-full sm:w-auto rounded-full px-7 h-12 text-base font-medium bg-transparent', isDark ? 'border-white/10 text-white/72 hover:bg-white/[0.05]' : 'border-black/[0.08] text-zinc-700 hover:bg-black/[0.03]')}>
-                            打开完整播放器
+                            全部电台
                           </Button>
                         </motion.div>
 
                         <motion.div variants={fadeInUp} className="grid gap-3 sm:grid-cols-3">
                           {heroPillars.map((item) => (
                             <div key={item.label} className={cn('rounded-[24px] p-4', isDark ? 'bg-white/[0.035] border border-white/[0.06]' : 'bg-white/70 border border-black/[0.05]')}>
-                              <div className={cn('text-[11px] uppercase tracking-[0.18em] mb-2', isDark ? 'text-white/32' : 'text-zinc-400')}>{item.label}</div>
+                              <div className={cn('text-[11px] uppercase tracking-[0.18em] mb-2', isDark ? 'text-white/32' : 'text-slate-400')}>{item.label}</div>
                               <div className={cn('text-sm leading-6 font-medium', isDark ? 'text-white/85' : 'text-zinc-800')}>{item.value}</div>
                             </div>
                           ))}
@@ -634,7 +633,7 @@ export default function Home() {
                           <div className="flex items-start justify-between gap-3 mb-5">
                             <div>
                               <div className={cn('text-[11px] uppercase tracking-[0.18em] mb-2', isDark ? 'text-white/34' : 'text-zinc-400')}>当前状态</div>
-                              <div className={cn('text-xl font-semibold tracking-tight', isDark ? 'text-white' : 'text-zinc-900')}>{isPlaying && currentStation ? currentStation.name : '等待开始播放'}</div>
+                              <div className={cn('text-xl font-semibold tracking-tight', isDark ? 'text-white' : 'text-zinc-900')}>{isPlaying && currentStation ? currentStation.name : 'Ready'}</div>
                             </div>
                             <div className="w-2.5 h-2.5 rounded-full mt-1.5" style={{ background: isPlaying ? stationColor : (isDark ? 'rgba(255,255,255,0.2)' : 'rgba(24,24,27,0.16)'), boxShadow: isPlaying ? `0 0 18px ${stationColor}` : 'none' }} />
                           </div>
@@ -661,7 +660,7 @@ export default function Home() {
                           background: isDark ? 'linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025))' : 'linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.68))',
                           border: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(15,23,42,0.05)',
                         }}>
-                        <div className={cn('text-[11px] uppercase tracking-[0.2em] mb-4', isDark ? 'text-white/34' : 'text-zinc-400')}>快捷操作</div>
+                        <div className={cn('text-[11px] uppercase tracking-[0.2em] mb-4', isDark ? 'text-white/34' : 'text-slate-400')}>Controls</div>
                         <div className="grid grid-cols-2 sm:grid-cols-5 lg:grid-cols-2 gap-2.5">
                           {shortcuts.map((item, i) => (
                             <div key={i} className={cn('inline-flex items-center gap-2 px-3 py-2.5 rounded-2xl', isDark ? 'bg-white/[0.04] border border-white/[0.06]' : 'bg-white/75 border border-black/[0.05]')}>
@@ -677,7 +676,7 @@ export default function Home() {
                           background: isDark ? 'linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))' : 'linear-gradient(180deg, rgba(255,255,255,0.84), rgba(255,255,255,0.70))',
                           border: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(15,23,42,0.05)',
                         }}>
-                        <div className={cn('text-[11px] uppercase tracking-[0.2em] mb-4', isDark ? 'text-white/34' : 'text-zinc-400')}>设计升级说明</div>
+                        <div className={cn('text-[11px] uppercase tracking-[0.2em] mb-4', isDark ? 'text-white/34' : 'text-slate-400')}>Highlights</div>
                         <div className="grid gap-3 sm:grid-cols-3">
                           {productHighlights.map((item) => (
                             <div key={item.title} className={cn('rounded-[22px] p-4', isDark ? 'bg-white/[0.035]' : 'bg-black/[0.02]')}>
@@ -797,9 +796,9 @@ export default function Home() {
 
             <GlassPanel isDark={isDark} className="rounded-[34px] p-5 sm:p-8 md:p-10">
               <SectionHeader
-                eyebrow="Advantages"
-                title="为什么它看起来应该更像一款原生产品"
-                description="把结构、留白和层级重新做干净之后，功能本身的价值会更突出，用户也更容易长时间停留。"
+                eyebrow="Features"
+                title="核心功能"
+                description="少一点说明，直接看能力。"
                 isDark={isDark}
               />
               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-10">
@@ -814,9 +813,9 @@ export default function Home() {
           <div className="max-w-5xl mx-auto">
             <GlassPanel isDark={isDark} className="rounded-[34px] p-5 sm:p-8 md:p-10">
               <SectionHeader
-                eyebrow="Scenarios"
-                title="让不同状态，都能快速找到合适氛围"
-                description="不把信息堆满，而是用更直观的场景入口，让用户在 1 秒内找到适合当下情绪和任务的声音。"
+                eyebrow="Scenes"
+                title="适用场景"
+                description="学习、工作、阅读、夜晚。"
                 isDark={isDark}
               />
               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-10">
@@ -832,8 +831,8 @@ export default function Home() {
             <GlassPanel isDark={isDark} className="rounded-[34px] p-5 sm:p-8 md:p-10">
               <SectionHeader
                 eyebrow="Stations"
-                title="精选电台以更克制的方式呈现"
-                description="保留原有电台选择逻辑，但重构卡片节奏和容器结构，让浏览和选择都更像一个成熟的媒体产品。"
+                title="精选电台"
+                description="点开就能听。"
                 isDark={isDark}
               />
               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-10">
@@ -859,9 +858,9 @@ export default function Home() {
               <AmbientOrb className="-bottom-10 left-8 w-40 h-40 sm:w-56 sm:h-56" color={isDark ? 'rgba(255,255,255,0.12)' : 'rgba(216,180,254,0.36)'} blur={100} />
               <div className="relative">
                 <SectionHeader
-                  eyebrow="Start Now"
-                  title="当页面本身足够安静，专注就更容易发生"
-                  description="无需注册、无需下载，打开即听。现在这版界面更像一个被精心打磨过的专注产品，而不是普通网页集合。"
+                  eyebrow="Start"
+                  title="打开，播放，进入状态。"
+                  description="无需注册，无需下载。"
                   isDark={isDark}
                 />
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="relative inline-block mt-8">
@@ -884,8 +883,8 @@ export default function Home() {
           <div className="max-w-5xl mx-auto">
             <SectionHeader
               eyebrow="FAQ"
-              title="常见问题也应保持干净、易读与放松感"
-              description="延续整页的玻璃层次和克制排版，让用户在阅读帮助信息时不会突然跳出当前的视觉语境。"
+              title="常见问题"
+              description="快速了解即可。"
               isDark={isDark}
             />
 
