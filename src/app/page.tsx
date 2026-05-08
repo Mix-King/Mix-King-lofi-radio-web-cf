@@ -163,6 +163,18 @@ const listeningModes = [
   { title: 'Night Cocoon', description: '夜间氛围更柔和，降低刺眼高对比造成的疲劳。', color: '#EC4899' },
 ];
 
+const heroPillars = [
+  { label: '视觉语言', value: 'Glass / Quiet / Precision' },
+  { label: '交互原则', value: '保持播放器核心逻辑原样' },
+  { label: '使用状态', value: '更适合长期打开与陪伴式收听' },
+];
+
+const productHighlights = [
+  { title: '一个页面，进入专注状态', description: '打开即播、无需学习成本，把视觉噪音压低，把音乐与状态前置。 ' },
+  { title: '像桌面产品，而不是普通网页', description: '通过更强留白、低饱和中性色和玻璃结构，让界面更接近 Apple 风的静谧质感。' },
+  { title: '所有改动都围绕安全升级', description: '不触碰核心能力，只重写呈现方式，让功能可用性和高级感同时保住。' },
+];
+
 // 导航栏组件 - 药丸胶囊形式 + 高斯模糊
 const NavBar = memo(({ isDark, isPlaying, currentStation, stationColor, onThemeToggle }: {
   isDark: boolean; isPlaying: boolean; currentStation: typeof stations[0] | null; stationColor: string; onThemeToggle: () => void;
@@ -350,6 +362,38 @@ const GlassPanel = memo(({ isDark, className, children }: { isDark: boolean; cla
 ));
 GlassPanel.displayName = 'GlassPanel';
 
+const SectionHeader = memo(({ eyebrow, title, description, isDark, align = 'center' }: {
+  eyebrow: string;
+  title: string;
+  description: string;
+  isDark: boolean;
+  align?: 'center' | 'left';
+}) => (
+  <motion.div
+    initial={{ opacity: 0, y: 18 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.45 }}
+    className={cn(align === 'center' ? 'text-center' : 'text-left')}
+  >
+    <div className={cn('mb-4 flex', align === 'center' ? 'justify-center' : 'justify-start')}>
+      <span className={cn(
+        'inline-flex items-center rounded-full px-3 py-1 text-[11px] sm:text-xs font-semibold tracking-[0.22em] uppercase',
+        isDark ? 'bg-white/[0.05] text-white/45 border border-white/[0.07]' : 'bg-white/75 text-zinc-500 border border-black/[0.05]'
+      )}>
+        {eyebrow}
+      </span>
+    </div>
+    <h2 className={cn('text-[28px] sm:text-[38px] lg:text-[44px] font-semibold tracking-[-0.04em] mb-3', isDark ? 'text-white' : 'text-zinc-950')}>
+      {title}
+    </h2>
+    <p className={cn('text-sm sm:text-base lg:text-[17px] leading-7 max-w-2xl', align === 'center' ? 'mx-auto' : '', isDark ? 'text-white/44' : 'text-zinc-500')}>
+      {description}
+    </p>
+  </motion.div>
+));
+SectionHeader.displayName = 'SectionHeader';
+
 // ==================== 主页 ====================
 export default function Home() {
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -488,8 +532,8 @@ export default function Home() {
         <NavBar isDark={isDark} isPlaying={isPlaying} currentStation={currentStation} stationColor={stationColor} onThemeToggle={handleThemeToggle} />
 
         {/* Hero Section */}
-        <section className="pt-22 pb-10 sm:pb-14 px-4 sm:px-6">
-          <div className="max-w-4xl mx-auto text-center">
+        <section className="pt-24 pb-12 sm:pb-18 px-4 sm:px-6">
+          <div className="max-w-6xl mx-auto text-center">
             <motion.div initial="hidden" animate="visible" variants={stagger}>
 
               {/* 标签 */}
@@ -508,91 +552,140 @@ export default function Home() {
               </motion.div>
 
               <motion.div variants={fadeInUp} className="relative mt-2 sm:mt-4">
-                <GlassPanel isDark={isDark} className="rounded-[32px] sm:rounded-[40px] p-5 sm:p-8 md:p-10 text-left">
-                  <AmbientOrb className="-top-12 -left-10 w-40 h-40 sm:w-56 sm:h-56" color={`${stationColor}55`} />
-                  <AmbientOrb className="top-10 -right-10 w-36 h-36 sm:w-52 sm:h-52" color={isDark ? 'rgba(236,72,153,0.36)' : 'rgba(125,211,252,0.45)'} blur={90} />
-                  <AmbientOrb className="-bottom-16 left-1/3 w-44 h-44 sm:w-60 sm:h-60" color={isDark ? 'rgba(6,182,212,0.28)' : 'rgba(196,181,253,0.50)'} blur={110} />
+                <GlassPanel isDark={isDark} className="rounded-[36px] sm:rounded-[44px] p-4 sm:p-6 md:p-8 text-left">
+                  <AmbientOrb className="-top-16 left-6 w-48 h-48 sm:w-72 sm:h-72" color={`${stationColor}40`} blur={110} />
+                  <AmbientOrb className="top-0 right-0 w-44 h-44 sm:w-64 sm:h-64" color={isDark ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.65)'} blur={95} />
+                  <AmbientOrb className="bottom-10 left-1/2 -translate-x-1/2 w-52 h-52 sm:w-72 sm:h-72" color={isDark ? 'rgba(14,165,233,0.18)' : 'rgba(196,181,253,0.38)'} blur={120} />
 
-                  <div className="relative grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-center">
-                    <div>
-                      <div className="flex flex-wrap items-center gap-3 mb-5">
-                        <div className="inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[11px] sm:text-xs font-semibold tracking-[0.16em] uppercase"
-                          style={{
-                            background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.7)',
-                            color: isDark ? 'rgba(255,255,255,0.76)' : '#4c1d95',
-                            border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(139,92,246,0.12)',
-                          }}>
-                          <Sparkles className="w-3.5 h-3.5" />
-                          Impeccable 风格重构中
+                  <div className="relative space-y-5 sm:space-y-6">
+                    <div className="grid gap-4 lg:grid-cols-[1.35fr_0.65fr]">
+                      <div className="rounded-[28px] sm:rounded-[34px] p-6 sm:p-8 md:p-10"
+                        style={{
+                          background: isDark
+                            ? 'linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03))'
+                            : 'linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.62))',
+                          border: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(15,23,42,0.05)',
+                        }}>
+                        <div className="flex flex-wrap items-center gap-3 mb-6">
+                          <div className="inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[11px] sm:text-xs font-semibold tracking-[0.18em] uppercase"
+                            style={{
+                              background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.78)',
+                              color: isDark ? 'rgba(255,255,255,0.72)' : '#3f3f46',
+                              border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(15,23,42,0.05)',
+                            }}>
+                            <Sparkles className="w-3.5 h-3.5" />
+                            Quiet Luxury Interface
+                          </div>
+                          <a href="https://lofi.88lin.eu.org/" target="_blank" rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[11px] sm:text-xs font-medium transition-all hover:scale-[1.02]"
+                            style={{
+                              background: isDark ? 'rgba(139,92,246,0.10)' : 'rgba(255,255,255,0.72)',
+                              color: isDark ? '#e9d5ff' : '#52525b',
+                              border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(15,23,42,0.05)',
+                            }}>
+                            网页版实时可用
+                            <ExternalLink className="w-3 h-3 opacity-70" />
+                          </a>
                         </div>
-                        <a href="https://lofi.88lin.eu.org/" target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[11px] sm:text-xs font-medium transition-all hover:scale-[1.02]"
-                          style={{
-                            background: isDark ? 'rgba(139,92,246,0.12)' : 'rgba(139,92,246,0.08)',
-                            color: isDark ? '#ddd6fe' : '#6d28d9',
-                            border: isDark ? '1px solid rgba(139,92,246,0.24)' : '1px solid rgba(139,92,246,0.14)',
-                          }}>
-                          网页版已上线
-                          <ExternalLink className="w-3 h-3 opacity-70" />
-                        </a>
-                      </div>
 
-                      <motion.h1 variants={fadeInUp} className="text-4xl sm:text-5xl md:text-6xl lg:text-[72px] font-bold leading-[0.98] tracking-[-0.04em] mb-5 text-center sm:text-left">
-                        <span className={cn(
-                          'bg-clip-text text-transparent',
-                          isDark
-                            ? 'bg-[linear-gradient(135deg,#faf5ff_0%,#c4b5fd_28%,#7dd3fc_62%,#f9a8d4_100%)]'
-                            : 'bg-[linear-gradient(135deg,#18181b_0%,#6d28d9_40%,#0f766e_100%)]'
-                        )}>
-                          让专注听感
+                        <motion.h1 variants={fadeInUp} className={cn('text-[38px] sm:text-[54px] md:text-[66px] lg:text-[82px] leading-[0.92] tracking-[-0.06em] font-semibold mb-6', isDark ? 'text-white' : 'text-zinc-950')}>
+                          把 Lo‑fi 电台
                           <br className="hidden sm:block" />
-                          变得更安静、更高级
-                        </span>
-                      </motion.h1>
+                          做成一块安静的玻璃屏幕
+                        </motion.h1>
 
-                      <motion.p variants={fadeInUp} className={cn('text-[15px] sm:text-lg md:text-xl max-w-2xl leading-8 sm:leading-9 mb-7 text-center sm:text-left', isDark ? 'text-white/58' : 'text-zinc-600')}>
-                        不改动播放、计时、电台切换这些核心能力，只针对界面层做精修。
-                        <br className="hidden sm:block" />
-                        基于 Impeccable 提倡的节奏、留白、对比和克制动效，把当前页面打磨成更耐看、更像成品的状态。
-                      </motion.p>
+                        <motion.p variants={fadeInUp} className={cn('text-[15px] sm:text-[17px] md:text-[19px] leading-8 sm:leading-9 max-w-2xl mb-8', isDark ? 'text-white/50' : 'text-zinc-600')}>
+                          保留你现在这套页面的播放、切台、计时和睡眠功能，
+                          但把整体视觉重做成更接近 Apple 官网和原生产品页的感觉：更少装饰，更强结构，更耐看。
+                        </motion.p>
 
-                      <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-7">
-                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
+                        <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-8">
                           <Button size="lg" onClick={() => togglePlay()}
-                            className="w-full sm:w-52 rounded-full px-10 h-12 text-base font-semibold shadow-xl flex items-center justify-center border-0"
-                            style={{ background: 'linear-gradient(135deg, #8B5CF6, #D946EF)', boxShadow: '0 12px 40px rgba(139,92,246,0.30)' }}>
-                            {isPlaying ? <><Pause className="w-5 h-5 mr-2" /><span>正在播放</span></> : <><Play className="w-5 h-5 mr-2" /><span>开始播放</span></>}
+                            className="w-full sm:w-auto min-w-[180px] rounded-full px-8 h-12 text-base font-semibold shadow-none border-0"
+                            style={{
+                              background: isDark ? 'rgba(255,255,255,0.94)' : '#111827',
+                              color: isDark ? '#09090b' : '#ffffff',
+                              boxShadow: isDark ? '0 14px 30px rgba(255,255,255,0.08)' : '0 18px 36px rgba(15,23,42,0.16)',
+                            }}>
+                            {isPlaying ? <><Pause className="w-5 h-5 mr-2" /><span>{isLoading ? '加载中...' : '暂停收听'}</span></> : <><Play className="w-5 h-5 mr-2" /><span>立即进入专注</span></>}
+                          </Button>
+                          <Button variant="outline" size="lg" onClick={() => setMiniMode(false)}
+                            className={cn('w-full sm:w-auto rounded-full px-7 h-12 text-base font-medium bg-transparent', isDark ? 'border-white/10 text-white/72 hover:bg-white/[0.05]' : 'border-black/[0.08] text-zinc-700 hover:bg-black/[0.03]')}>
+                            打开完整播放器
                           </Button>
                         </motion.div>
-                        <div className={cn('flex items-center justify-center sm:justify-start gap-2 text-sm', isDark ? 'text-white/40' : 'text-zinc-500')}>
-                          <div className="w-2 h-2 rounded-full" style={{ background: stationColor, boxShadow: `0 0 14px ${stationColor}` }} />
-                          <span>当前主题色跟随电台变化，播放器逻辑保持不变</span>
-                        </div>
-                      </motion.div>
 
-                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7, duration: 0.5 }} className="hidden sm:flex flex-wrap gap-2.5">
-                        {shortcuts.map((item, i) => (
-                          <div key={i} className={cn('inline-flex items-center gap-2 px-3 py-2 rounded-2xl', isDark ? 'bg-white/[0.035] border border-white/[0.06]' : 'bg-white/70 border border-black/[0.05]')}>
-                            <kbd className={cn('px-2 py-0.5 rounded-md text-xs font-mono font-semibold', isDark ? 'bg-white/10 text-white/60 border border-white/10' : 'bg-black/5 text-zinc-600 border border-black/8')}>{item.key}</kbd>
-                            <span className={cn('text-xs', isDark ? 'text-white/40' : 'text-zinc-500')}>{item.label}</span>
-                          </div>
-                        ))}
-                      </motion.div>
-                    </div>
-
-                    <div className="relative flex flex-col gap-4">
-                      <div className="flex justify-center lg:justify-end">
-                        <LiveClock isDark={isDark} stationColor={stationColor} isPlaying={isPlaying} />
+                        <motion.div variants={fadeInUp} className="grid gap-3 sm:grid-cols-3">
+                          {heroPillars.map((item) => (
+                            <div key={item.label} className={cn('rounded-[24px] p-4', isDark ? 'bg-white/[0.035] border border-white/[0.06]' : 'bg-white/70 border border-black/[0.05]')}>
+                              <div className={cn('text-[11px] uppercase tracking-[0.18em] mb-2', isDark ? 'text-white/32' : 'text-zinc-400')}>{item.label}</div>
+                              <div className={cn('text-sm leading-6 font-medium', isDark ? 'text-white/85' : 'text-zinc-800')}>{item.value}</div>
+                            </div>
+                          ))}
+                        </motion.div>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3">
-                        {trustStats.map((item) => (
-                          <div key={item.label} className={cn('rounded-[24px] p-4 text-left', isDark ? 'bg-white/[0.04] border border-white/[0.06]' : 'bg-white/72 border border-black/[0.05]')}>
-                            <div className={cn('text-[11px] uppercase tracking-[0.18em] mb-2', isDark ? 'text-white/34' : 'text-zinc-400')}>{item.label}</div>
-                            <div className={cn('text-2xl font-semibold tracking-tight mb-1', isDark ? 'text-white' : 'text-zinc-900')}>{item.value}</div>
-                            <div className={cn('text-xs leading-5', isDark ? 'text-white/44' : 'text-zinc-500')}>{item.description}</div>
+                      <div className="grid gap-4">
+                        <div className="rounded-[28px] sm:rounded-[34px] p-5 sm:p-6"
+                          style={{
+                            background: isDark ? 'linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.035))' : 'linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.70))',
+                            border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(15,23,42,0.05)',
+                          }}>
+                          <div className="flex items-start justify-between gap-3 mb-5">
+                            <div>
+                              <div className={cn('text-[11px] uppercase tracking-[0.18em] mb-2', isDark ? 'text-white/34' : 'text-zinc-400')}>当前状态</div>
+                              <div className={cn('text-xl font-semibold tracking-tight', isDark ? 'text-white' : 'text-zinc-900')}>{isPlaying && currentStation ? currentStation.name : '等待开始播放'}</div>
+                            </div>
+                            <div className="w-2.5 h-2.5 rounded-full mt-1.5" style={{ background: isPlaying ? stationColor : (isDark ? 'rgba(255,255,255,0.2)' : 'rgba(24,24,27,0.16)'), boxShadow: isPlaying ? `0 0 18px ${stationColor}` : 'none' }} />
                           </div>
-                        ))}
+                          <div className="flex justify-center py-2">
+                            <LiveClock isDark={isDark} stationColor={stationColor} isPlaying={isPlaying} />
+                          </div>
+                        </div>
+
+                        <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+                          {trustStats.map((item) => (
+                            <div key={item.label} className={cn('rounded-[26px] p-4', isDark ? 'bg-white/[0.04] border border-white/[0.06]' : 'bg-white/72 border border-black/[0.05]')}>
+                              <div className={cn('text-[11px] uppercase tracking-[0.18em] mb-2', isDark ? 'text-white/34' : 'text-zinc-400')}>{item.label}</div>
+                              <div className={cn('text-[26px] font-semibold tracking-[-0.04em] mb-1', isDark ? 'text-white' : 'text-zinc-900')}>{item.value}</div>
+                              <div className={cn('text-xs leading-5', isDark ? 'text-white/46' : 'text-zinc-500')}>{item.description}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid gap-4 lg:grid-cols-[0.92fr_1.08fr]">
+                      <div className="rounded-[28px] sm:rounded-[34px] p-5 sm:p-6"
+                        style={{
+                          background: isDark ? 'linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025))' : 'linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.68))',
+                          border: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(15,23,42,0.05)',
+                        }}>
+                        <div className={cn('text-[11px] uppercase tracking-[0.2em] mb-4', isDark ? 'text-white/34' : 'text-zinc-400')}>快捷操作</div>
+                        <div className="grid grid-cols-2 sm:grid-cols-5 lg:grid-cols-2 gap-2.5">
+                          {shortcuts.map((item, i) => (
+                            <div key={i} className={cn('inline-flex items-center gap-2 px-3 py-2.5 rounded-2xl', isDark ? 'bg-white/[0.04] border border-white/[0.06]' : 'bg-white/75 border border-black/[0.05]')}>
+                              <kbd className={cn('px-2 py-0.5 rounded-md text-xs font-mono font-semibold', isDark ? 'bg-white/10 text-white/60 border border-white/10' : 'bg-black/5 text-zinc-600 border border-black/8')}>{item.key}</kbd>
+                              <span className={cn('text-xs', isDark ? 'text-white/42' : 'text-zinc-500')}>{item.label}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="rounded-[28px] sm:rounded-[34px] p-5 sm:p-6"
+                        style={{
+                          background: isDark ? 'linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))' : 'linear-gradient(180deg, rgba(255,255,255,0.84), rgba(255,255,255,0.70))',
+                          border: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(15,23,42,0.05)',
+                        }}>
+                        <div className={cn('text-[11px] uppercase tracking-[0.2em] mb-4', isDark ? 'text-white/34' : 'text-zinc-400')}>设计升级说明</div>
+                        <div className="grid gap-3 sm:grid-cols-3">
+                          {productHighlights.map((item) => (
+                            <div key={item.title} className={cn('rounded-[22px] p-4', isDark ? 'bg-white/[0.035]' : 'bg-black/[0.02]')}>
+                              <h3 className={cn('text-sm font-semibold mb-2', isDark ? 'text-white/88' : 'text-zinc-900')}>{item.title}</h3>
+                              <p className={cn('text-xs sm:text-sm leading-6', isDark ? 'text-white/44' : 'text-zinc-500')}>{item.description}</p>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -686,13 +779,13 @@ export default function Home() {
         </section>
 
         {/* Features Section */}
-        <section className="sm:py-2 px-4 sm:px-6">
+        <section className="py-8 sm:py-12 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto">
-            <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="mb-6 sm:mb-8">
-              <GlassPanel isDark={isDark} className="rounded-[28px] p-4 sm:p-5">
+            <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="mb-8 sm:mb-10">
+              <GlassPanel isDark={isDark} className="rounded-[30px] p-4 sm:p-5 md:p-6">
                 <div className="grid gap-3 md:grid-cols-3">
                   {listeningModes.map((mode) => (
-                    <div key={mode.title} className={cn('rounded-3xl p-4', isDark ? 'bg-white/[0.03]' : 'bg-black/[0.02]')}>
+                    <div key={mode.title} className={cn('rounded-[26px] p-5', isDark ? 'bg-white/[0.03]' : 'bg-black/[0.02]')}>
                       <div className="w-10 h-1.5 rounded-full mb-4" style={{ background: `linear-gradient(90deg, ${mode.color}, transparent)` }} />
                       <h3 className={cn('text-sm sm:text-base font-semibold mb-2', isDark ? 'text-white/92' : 'text-zinc-900')}>{mode.title}</h3>
                       <p className={cn('text-xs sm:text-sm leading-6', isDark ? 'text-white/44' : 'text-zinc-500')}>{mode.description}</p>
@@ -702,103 +795,108 @@ export default function Home() {
               </GlassPanel>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="text-center mb-10">
-              <h2 className={cn("text-2xl sm:text-3xl font-bold mb-3", isDark ? "text-white" : "text-zinc-900")}>为什么选择 Lofi Radio</h2>
-              <p className={cn("text-base sm:text-lg max-w-xl mx-auto", isDark ? "text-white/38" : "text-zinc-500")}>专为专注设计，让音乐成为你工作和学习的最佳伴侣</p>
-            </motion.div>
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {features.map((f) => <FeatureCard key={f.title} feature={f} isDark={isDark} />)}
-            </motion.div>
+            <GlassPanel isDark={isDark} className="rounded-[34px] p-5 sm:p-8 md:p-10">
+              <SectionHeader
+                eyebrow="Advantages"
+                title="为什么它看起来应该更像一款原生产品"
+                description="把结构、留白和层级重新做干净之后，功能本身的价值会更突出，用户也更容易长时间停留。"
+                isDark={isDark}
+              />
+              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-10">
+                {features.map((f) => <FeatureCard key={f.title} feature={f} isDark={isDark} />)}
+              </motion.div>
+            </GlassPanel>
           </div>
         </section>
 
         {/* 使用场景 Section */}
-        <section className="py-6 sm:py-8 px-4 sm:px-6">
+        <section className="py-8 sm:py-12 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto">
-            <motion.div initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="text-center mb-10">
-              <h2 className={cn("text-2xl sm:text-3xl font-bold mb-3", isDark ? "text-white" : "text-zinc-900")}>适用场景</h2>
-              <p className={cn("text-base sm:text-lg", isDark ? "text-white/38" : "text-zinc-500")}>无论学习、工作还是放松，总有一个电台适合你</p>
-            </motion.div>
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-              {scenes.map((s) => <SceneCard key={s.title} scene={s} isDark={isDark} onClick={() => handleSceneClick(s.id)} />)}
-            </motion.div>
+            <GlassPanel isDark={isDark} className="rounded-[34px] p-5 sm:p-8 md:p-10">
+              <SectionHeader
+                eyebrow="Scenarios"
+                title="让不同状态，都能快速找到合适氛围"
+                description="不把信息堆满，而是用更直观的场景入口，让用户在 1 秒内找到适合当下情绪和任务的声音。"
+                isDark={isDark}
+              />
+              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-10">
+                {scenes.map((s) => <SceneCard key={s.title} scene={s} isDark={isDark} onClick={() => handleSceneClick(s.id)} />)}
+              </motion.div>
+            </GlassPanel>
           </div>
         </section>
 
         {/* 电台展示 */}
-        <section className="py-6 sm:py-8 px-4 sm:px-6">
+        <section className="py-8 sm:py-12 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto">
-            <motion.div initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="text-center mb-10">
-              <h2 className={cn("text-2xl sm:text-3xl font-bold mb-3", isDark ? "text-white" : "text-zinc-900")}>精选电台</h2>
-              <p className={cn("text-base sm:text-lg", isDark ? "text-white/38" : "text-zinc-500")}>涵盖多种风格，总有适合你的音乐</p>
-            </motion.div>
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-              {stations.slice(0, 8).map((station) => (
-                <StationCard key={station.id} station={station} isDark={isDark} isActive={currentStation?.id === station.id} isPlaying={isPlaying} onClick={() => handleStationClick(station.id)} />
-              ))}
-            </motion.div>
-            <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center mt-6">
-              <Button variant="outline" size="sm" className={cn("rounded-full gap-2 px-5 h-9", isDark && "border-white/15 text-white/60 hover:bg-white/[0.07] hover:text-white/80")} onClick={() => setMiniMode(false)}>
-                查看全部电台
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-            </motion.div>
+            <GlassPanel isDark={isDark} className="rounded-[34px] p-5 sm:p-8 md:p-10">
+              <SectionHeader
+                eyebrow="Stations"
+                title="精选电台以更克制的方式呈现"
+                description="保留原有电台选择逻辑，但重构卡片节奏和容器结构，让浏览和选择都更像一个成熟的媒体产品。"
+                isDark={isDark}
+              />
+              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-10">
+                {stations.slice(0, 8).map((station) => (
+                  <StationCard key={station.id} station={station} isDark={isDark} isActive={currentStation?.id === station.id} isPlaying={isPlaying} onClick={() => handleStationClick(station.id)} />
+                ))}
+              </motion.div>
+              <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center mt-8">
+                <Button variant="outline" size="sm" className={cn("rounded-full gap-2 px-5 h-10 bg-transparent", isDark ? "border-white/12 text-white/65 hover:bg-white/[0.06] hover:text-white/88" : "border-black/[0.08] text-zinc-700 hover:bg-black/[0.03]")} onClick={() => setMiniMode(false)}>
+                  查看全部电台
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </motion.div>
+            </GlassPanel>
           </div>
         </section>
 
         {/* CTA Section */}
-        <section className="py-6 sm:py-10 px-4 sm:px-6">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="max-w-3xl mx-auto text-center">
-            <div className="relative p-8 sm:p-12 rounded-3xl overflow-hidden" style={{
-              background: isDark ? 'linear-gradient(135deg, rgba(139,92,246,0.1), rgba(217,70,239,0.05))' : 'linear-gradient(135deg, rgba(139,92,246,0.07), rgba(217,70,239,0.03))',
-              border: isDark ? '1px solid rgba(139,92,246,0.18)' : '1px solid rgba(139,92,246,0.12)',
-            }}>
-              <div className="absolute top-6 right-8 w-24 h-24 rounded-full blur-2xl opacity-20" style={{ background: 'radial-gradient(circle, #8B5CF6, transparent)' }} />
-              <div className="absolute bottom-4 left-6 w-16 h-16 rounded-full blur-xl opacity-15" style={{ background: 'radial-gradient(circle, #EC4899, transparent)' }} />
-              <h2 className={cn("text-2xl sm:text-3xl font-bold mb-3 relative", isDark ? "text-white" : "text-zinc-900")}>开始你的专注之旅</h2>
-              <p className={cn("text-sm sm:text-base mb-8 relative max-w-xl mx-auto leading-relaxed", isDark ? "text-white/45" : "text-zinc-500")}>
-                无需注册，无需下载，打开网页即可享受高品质的专注音乐。让 Lofi Radio 成为你每天工作学习的最佳伴侣。
-              </p>
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="relative inline-block">
-                <Button size="lg" onClick={() => { togglePlay(); if (!userWantsPlay) setMiniMode(false); }}
-                  className="rounded-full px-8 h-12 text-base font-semibold shadow-xl"
-                  style={{ background: 'linear-gradient(135deg, #8B5CF6, #D946EF)', boxShadow: '0 8px 32px rgba(139,92,246,0.4)' }}>
-                  {userWantsPlay ? <><Pause className="w-5 h-5 mr-2" />{isLoading ? '加载中...' : '正在播放'}</> : <><Play className="w-5 h-5 mr-2" />立即开始</>}
-                </Button>
-              </motion.div>
-            </div>
+        <section className="py-8 sm:py-14 px-4 sm:px-6">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="max-w-5xl mx-auto text-center">
+            <GlassPanel isDark={isDark} className="rounded-[36px] p-6 sm:p-8 md:p-12 overflow-hidden">
+              <AmbientOrb className="-top-10 right-8 w-40 h-40 sm:w-56 sm:h-56" color={`${stationColor}32`} blur={100} />
+              <AmbientOrb className="-bottom-10 left-8 w-40 h-40 sm:w-56 sm:h-56" color={isDark ? 'rgba(255,255,255,0.12)' : 'rgba(216,180,254,0.36)'} blur={100} />
+              <div className="relative">
+                <SectionHeader
+                  eyebrow="Start Now"
+                  title="当页面本身足够安静，专注就更容易发生"
+                  description="无需注册、无需下载，打开即听。现在这版界面更像一个被精心打磨过的专注产品，而不是普通网页集合。"
+                  isDark={isDark}
+                />
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="relative inline-block mt-8">
+                  <Button size="lg" onClick={() => { togglePlay(); if (!userWantsPlay) setMiniMode(false); }}
+                    className="rounded-full px-8 h-12 text-base font-semibold border-0"
+                    style={{
+                      background: isDark ? 'rgba(255,255,255,0.94)' : '#111827',
+                      color: isDark ? '#09090b' : '#ffffff',
+                      boxShadow: isDark ? '0 20px 40px rgba(255,255,255,0.08)' : '0 20px 40px rgba(17,24,39,0.18)',
+                    }}>
+                    {userWantsPlay ? <><Pause className="w-5 h-5 mr-2" />{isLoading ? '加载中...' : '继续收听'}</> : <><Play className="w-5 h-5 mr-2" />立即开始</>}
+                  </Button>
+                </motion.div>
+              </div>
+            </GlassPanel>
           </motion.div>
         </section>
 
-        <section className="py-6 sm:py-10 px-4 sm:px-6">
+        <section className="py-8 sm:py-12 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto">
-            <motion.div initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="text-center mb-8 sm:mb-10">
-              <div className="mb-3 flex justify-center">
-                <span
-                  className={cn(
-                    "inline-flex items-center rounded-full px-3 py-1 text-[11px] sm:text-xs font-semibold tracking-[0.18em] uppercase",
-                    isDark ? "bg-white/[0.05] text-white/45 border border-white/[0.07]" : "bg-black/[0.03] text-zinc-500 border border-black/[0.05]"
-                  )}
-                >
-                  FAQ
-                </span>
-              </div>
-              <h2 className={cn("text-2xl sm:text-3xl font-bold mb-3", isDark ? "text-white" : "text-zinc-900")}>Lofi Radio 常见问题</h2>
-              <p className={cn("text-sm sm:text-base max-w-3xl mx-auto leading-relaxed", isDark ? "text-white/38" : "text-zinc-500")}>把使用时最容易遇到的几个问题整理在这里，既方便第一次打开网站时快速了解，也能帮你更快找到适合自己的收听方式和使用场景。</p>
-            </motion.div>
+            <SectionHeader
+              eyebrow="FAQ"
+              title="常见问题也应保持干净、易读与放松感"
+              description="延续整页的玻璃层次和克制排版，让用户在阅读帮助信息时不会突然跳出当前的视觉语境。"
+              isDark={isDark}
+            />
 
             <motion.div
               initial={{ opacity: 0, y: 18 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.45 }}
-              className={cn(
-                "rounded-[28px] p-3 sm:p-4 border overflow-hidden",
-                isDark
-                  ? "bg-white/[0.03] border-white/[0.06] shadow-[0_24px_80px_rgba(0,0,0,0.28)]"
-                  : "bg-white/90 border-black/[0.05] shadow-[0_20px_60px_rgba(15,23,42,0.08)]"
-              )}
+              className="mt-8"
             >
+              <GlassPanel isDark={isDark} className="rounded-[32px] p-3 sm:p-4 overflow-hidden">
               <Accordion type="single" collapsible className="w-full">
                 {homepageFaqs.map((faq, index) => (
                   <AccordionItem
@@ -825,6 +923,7 @@ export default function Home() {
                   </AccordionItem>
                 ))}
               </Accordion>
+              </GlassPanel>
             </motion.div>
           </div>
         </section>
